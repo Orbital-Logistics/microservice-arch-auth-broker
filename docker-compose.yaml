@@ -49,6 +49,25 @@ services:
       timeout: 5s
       retries: 8
 
+  spacecraft-service:
+    build: ./spacecraft-service
+    container_name: spacecraft-service
+    environment:
+      - CONFIG_SERVER_URI=${CONFIG_SERVER_URI:-http://config-server:8888}
+    ports: []
+    depends_on:
+      db:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+
   api-gateway:
     build: ./api-gateway
     container_name: api-gateway
@@ -56,6 +75,8 @@ services:
       - 8080:8080
     depends_on:
       user-service:
+        condition: service_healthy
+      spacecraft-service:
         condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
