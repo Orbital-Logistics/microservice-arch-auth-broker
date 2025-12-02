@@ -68,6 +68,25 @@ services:
       timeout: 5s
       retries: 8
 
+  cargo-service:
+    build: ./cargo-service
+    container_name: cargo-service
+    environment:
+      - CONFIG_SERVER_URI=${CONFIG_SERVER_URI:-http://config-server:8888}
+    ports: []
+    depends_on:
+      db:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+
   api-gateway:
     build: ./api-gateway
     container_name: api-gateway
@@ -77,6 +96,8 @@ services:
       user-service:
         condition: service_healthy
       spacecraft-service:
+        condition: service_healthy
+      cargo-service:
         condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
@@ -88,8 +109,8 @@ services:
     build: ./config-server
     container_name: config-server
     environment:
-      - CONFIG_USERNAME=${CONFIG_USERNAME}
-      - CONFIG_TOKEN=${CONFIG_TOKEN}
+      - CONFIG_USERNAME=OSkull32
+      - CONFIG_TOKEN=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
     ports:
       - 8888:8888
     depends_on:

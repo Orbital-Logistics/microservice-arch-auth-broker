@@ -7,7 +7,7 @@ plugins {
 
 group = 'org.orbitalLogistic'
 version = '0.0.1-SNAPSHOT'
-description = 'spacecraft-service'
+description = 'cargo-service'
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
@@ -37,11 +37,12 @@ dependencyManagement {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.security:spring-security-crypto'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.12'
     implementation 'org.flywaydb:flyway-core'
     implementation 'org.flywaydb:flyway-database-postgresql'
@@ -61,3 +62,4 @@ tasks.named('test') {
     useJUnitPlatform()
     finalizedBy 'jacocoTestReport'
 }
+
