@@ -38,6 +38,12 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    @GetMapping("/{id}/username")
+    public ResponseEntity<String> getUsernameById(@PathVariable Long id) {
+        UserResponseDTO user = userService.findUserById(id);
+        return ResponseEntity.ok(user.username());
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDTO> updateUser(
             @PathVariable Long id,
