@@ -103,5 +103,8 @@ public class StorageUnitService {
                 volumeUsagePercentage
         );
     }
-}
 
+    public boolean storageUnitExists(Long id) {
+        return storageUnitRepository.existsById(id);
+    }
+}

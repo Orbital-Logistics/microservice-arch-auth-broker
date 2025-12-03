@@ -104,6 +104,10 @@ public class CargoService {
                 .orElseThrow(() -> new CargoNotFoundException("Cargo not found with id: " + id));
     }
 
+    public boolean cargoExists(Long id) {
+        return cargoRepository.existsById(id);
+    }
+
     private CargoResponseDTO toResponseDTO(Cargo cargo) {
         CargoCategory cargoCategory = cargoCategoryService.getEntityById(cargo.getCargoCategoryId());
         Integer totalQuantity = cargoStorageService.calculateTotalQuantityForCargo(cargo.getId());
@@ -115,4 +119,3 @@ public class CargoService {
         );
     }
 }
-

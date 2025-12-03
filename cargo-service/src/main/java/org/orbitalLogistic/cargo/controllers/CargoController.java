@@ -91,4 +91,10 @@ public class CargoController {
                 .header("X-Total-Count", String.valueOf(response.totalElements()))
                 .body(response);
     }
+
+    @GetMapping("/{id}/exists")
+    public ResponseEntity<Boolean> cargoExists(@PathVariable Long id) {
+        boolean exists = cargoService.cargoExists(id);
+        return ResponseEntity.ok(exists);
+    }
 }

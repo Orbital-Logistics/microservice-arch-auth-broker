@@ -67,5 +67,10 @@ public class StorageUnitController {
                 .header("X-Total-Count", String.valueOf(response.totalElements()))
                 .body(response);
     }
-}
 
+    @GetMapping("/{id}/exists")
+    public ResponseEntity<Boolean> storageUnitExists(@PathVariable Long id) {
+        boolean exists = storageUnitService.storageUnitExists(id);
+        return ResponseEntity.ok(exists);
+    }
+}
