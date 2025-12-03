@@ -90,6 +90,10 @@ public class UserService {
         return userRepository.findById(id).orElse(null);
     }
 
+    public boolean userExists(Long id) {
+        return userRepository.existsById(id);
+    }
+
     private UserResponseDTO toResponseDTO(User user) {
         return userMapper.toResponseDTO(user);
     }

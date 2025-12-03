@@ -58,4 +58,10 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{id}/exists")
+    public ResponseEntity<Boolean> userExists(@PathVariable Long id) {
+        boolean exists = userService.userExists(id);
+        return ResponseEntity.ok(exists);
+    }
 }

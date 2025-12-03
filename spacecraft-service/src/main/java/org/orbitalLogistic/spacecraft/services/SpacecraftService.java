@@ -196,6 +196,10 @@ public class SpacecraftService {
                 .orElseThrow(() -> new SpacecraftNotFoundException("Spacecraft not found with id: " + id));
     }
 
+    public boolean spacecraftExists(Long id) {
+        return spacecraftRepository.existsById(id);
+    }
+
     private SpacecraftResponseDTO toResponseDTO(Spacecraft spacecraft) {
         SpacecraftType spacecraftType = spacecraftTypeService.getEntityById(spacecraft.getSpacecraftTypeId());
 
@@ -214,4 +218,3 @@ public class SpacecraftService {
         );
     }
 }
-

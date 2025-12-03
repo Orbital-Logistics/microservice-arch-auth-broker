@@ -86,5 +86,10 @@ public class SpacecraftController {
         SpacecraftResponseDTO response = spacecraftService.updateSpacecraftStatus(id, status);
         return ResponseEntity.ok(response);
     }
-}
 
+    @GetMapping("/{id}/exists")
+    public ResponseEntity<Boolean> spacecraftExists(@PathVariable Long id) {
+        boolean exists = spacecraftService.spacecraftExists(id);
+        return ResponseEntity.ok(exists);
+    }
+}
