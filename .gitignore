@@ -1,4 +1,7 @@
-*/build
 .idea
+.env
+*/build
 */.gradle
+
 token.sh
+config_server_vars.md
