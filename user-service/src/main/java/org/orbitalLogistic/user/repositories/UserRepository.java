@@ -22,13 +22,13 @@ public interface UserRepository extends CrudRepository<User, Long> {
         ORDER BY id
         LIMIT :limit OFFSET :offset
        \s""")
-    List<User> findUsersWithFilters(String email, String name, int limit, int offset);
+    List<User> findUsersWithFilters(String email, String username, int limit, int offset);
 
     @Query("""
         SELECT COUNT(*) FROM users\s
         WHERE (:email IS NULL OR email LIKE CONCAT('%', :email, '%'))\s
         AND (:username IS NULL OR username LIKE CONCAT('%', :username, '%'))
        \s""")
-    long countUsersWithFilters(String email, String name);
+    long countUsersWithFilters(String email, String username);
 
 }
