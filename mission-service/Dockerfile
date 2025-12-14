@@ -1,6 +1,7 @@
 FROM gradle:8-jdk AS build
 WORKDIR /app
 COPY . .
+RUN gradle test --no-daemon --console=plain --info
 RUN gradle bootJar
 
 FROM eclipse-temurin:21-jre
