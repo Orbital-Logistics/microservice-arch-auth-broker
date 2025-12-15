@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: maintenance-service-test
+
+  flyway:
+    baseline-on-migrate: true
+
+  cloud:
+    config:
+      enabled: false
+
+eureka:
+  client:
+    enabled: false
+
+feign:
+  circuitbreaker:
+    enabled: false
