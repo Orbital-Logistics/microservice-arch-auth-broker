@@ -65,3 +65,10 @@ tasks.named('test') {
     finalizedBy 'jacocoTestReport'
 }
 
+test {
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+}
