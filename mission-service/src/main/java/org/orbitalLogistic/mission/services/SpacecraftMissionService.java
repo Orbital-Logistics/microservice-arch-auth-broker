@@ -3,7 +3,7 @@ package org.orbitalLogistic.mission.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.orbitalLogistic.mission.clients.SpacecraftDTO;
-import org.orbitalLogistic.mission.clients.SpacecraftServiceClient;
+import org.orbitalLogistic.mission.clients.resilient.ResilientSpacecraftService;
 import org.orbitalLogistic.mission.dto.request.SpacecraftMissionRequestDTO;
 import org.orbitalLogistic.mission.dto.response.SpacecraftMissionResponseDTO;
 import org.orbitalLogistic.mission.entities.Mission;
@@ -25,7 +25,7 @@ public class SpacecraftMissionService {
     private final SpacecraftMissionRepository spacecraftMissionRepository;
     private final MissionRepository missionRepository;
     private final SpacecraftMissionMapper spacecraftMissionMapper;
-    private final SpacecraftServiceClient spacecraftServiceClient;
+    private final ResilientSpacecraftService spacecraftServiceClient;
 
     public List<SpacecraftMissionResponseDTO> getAllSpacecraftMissions() {
         List<SpacecraftMission> spacecraftMissions = (List<SpacecraftMission>) spacecraftMissionRepository.findAll();

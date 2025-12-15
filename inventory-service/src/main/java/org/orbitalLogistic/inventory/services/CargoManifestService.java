@@ -2,6 +2,9 @@ package org.orbitalLogistic.inventory.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.orbitalLogistic.inventory.clients.*;
+import org.orbitalLogistic.inventory.clients.resilient.ResilientCargoServiceClient;
+import org.orbitalLogistic.inventory.clients.resilient.ResilientSpacecraftService;
+import org.orbitalLogistic.inventory.clients.resilient.ResilientUserService;
 import org.orbitalLogistic.inventory.dto.common.PageResponseDTO;
 import org.orbitalLogistic.inventory.dto.request.CargoManifestRequestDTO;
 import org.orbitalLogistic.inventory.dto.response.CargoManifestResponseDTO;
@@ -21,9 +24,9 @@ public class CargoManifestService {
 
     private final CargoManifestRepository cargoManifestRepository;
     private final CargoManifestMapper cargoManifestMapper;
-    private final UserServiceClient userServiceClient;
-    private final CargoServiceClient cargoServiceClient;
-    private final SpacecraftServiceClient spacecraftServiceClient;
+    private final ResilientUserService userServiceClient;
+    private final ResilientCargoServiceClient cargoServiceClient;
+    private final ResilientSpacecraftService spacecraftServiceClient;
 
     public PageResponseDTO<CargoManifestResponseDTO> getAllManifests(int page, int size) {
         int offset = page * size;

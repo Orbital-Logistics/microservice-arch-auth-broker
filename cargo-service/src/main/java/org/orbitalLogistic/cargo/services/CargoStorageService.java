@@ -10,11 +10,12 @@ import org.orbitalLogistic.cargo.entities.CargoStorage;
 import org.orbitalLogistic.cargo.entities.StorageUnit;
 import org.orbitalLogistic.cargo.exceptions.CargoStorageNotFoundException;
 import org.orbitalLogistic.cargo.exceptions.InsufficientCapacityException;
+import org.orbitalLogistic.cargo.exceptions.StorageUnitNotFoundException;
 import org.orbitalLogistic.cargo.mappers.CargoStorageMapper;
 import org.orbitalLogistic.cargo.repositories.CargoRepository;
 import org.orbitalLogistic.cargo.repositories.CargoStorageRepository;
 import org.orbitalLogistic.cargo.repositories.StorageUnitRepository;
-import org.orbitalLogistic.cargo.clients.UserServiceClient;
+import org.orbitalLogistic.cargo.clients.ResilientUserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +30,8 @@ public class CargoStorageService {
     private final CargoStorageMapper cargoStorageMapper;
     private final CargoRepository cargoRepository;
     private final StorageUnitRepository storageUnitRepository;
-    private final UserServiceClient userServiceClient;
+    private final ResilientUserService userServiceClient;
+    // private final UserServiceClient userServiceClient;
 
     public PageResponseDTO<CargoStorageResponseDTO> getAllCargoStorage(int page, int size) {
         int offset = page * size;
@@ -47,9 +49,11 @@ public class CargoStorageService {
     @Transactional
     public CargoStorageResponseDTO addCargoToStorage(CargoStorageRequestDTO request) {
         StorageUnit storageUnit = storageUnitRepository.findById(request.storageUnitId())
-                .orElseThrow(() -> new RuntimeException("Storage unit not found"));
+                .orElseThrow(() -> new StorageUnitNotFoundException("Storage unit not found"));
         Cargo cargo = cargoRepository.findById(request.cargoId())
-                .orElseThrow(() -> new RuntimeException("Cargo not found"));
+                .orElseThrow(() -> new CargoStorageNotFoundException("Cargo not found"));
+        
+        userServiceClient.getUserById(request.updatedByUserId());
 
         BigDecimal requiredMass = cargo.getMassPerUnit().multiply(BigDecimal.valueOf(request.quantity()));
         BigDecimal requiredVolume = cargo.getVolumePerUnit().multiply(BigDecimal.valueOf(request.quantity()));
@@ -139,11 +143,7 @@ public class CargoStorageService {
 
         String lastCheckedByUserName = null;
         if (cargoStorage.getLastCheckedByUserId() != null) {
-            try {
-                lastCheckedByUserName = userServiceClient.getUsernameById(cargoStorage.getLastCheckedByUserId());
-            } catch (Exception e) {
-                lastCheckedByUserName = "Unknown";
-            }
+            lastCheckedByUserName = userServiceClient.getUserById(cargoStorage.getLastCheckedByUserId());
         }
 
         return cargoStorageMapper.toResponseDTO(

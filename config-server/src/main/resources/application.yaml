@@ -11,5 +11,5 @@ spring:
           uri: https://github.com/Orbital-Logistics/configuration.git
           username: ${CONFIG_USERNAME}
           password: ${CONFIG_TOKEN}
-          default-label: main
+          default-label: bakhilin-patch-1
           search-paths: "{application}"

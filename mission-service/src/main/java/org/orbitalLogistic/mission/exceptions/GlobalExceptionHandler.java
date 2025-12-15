@@ -1,7 +1,7 @@
 package org.orbitalLogistic.mission.exceptions;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -20,6 +20,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MissionNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleMissionNotFoundException(MissionNotFoundException ex) {
         log.warn("Mission not found: {}", ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+            LocalDateTime.now(),
+            HttpStatus.NOT_FOUND.value(),
+            "Not Found",
+            ex.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(UserServiceNotFound.class)
+    public ResponseEntity<ErrorResponse> handleUserServiceNotFound(UserServiceNotFound ex) {
+        log.warn("User not found with id: {}", ex.getMessage());
         ErrorResponse errorResponse = new ErrorResponse(
             LocalDateTime.now(),
             HttpStatus.NOT_FOUND.value(),
@@ -98,6 +110,30 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(UserServiceException.class)
+    public ResponseEntity<ErrorResponse> handleUserServiceException(UserServiceException ex) {
+        log.error("User service error: {}", ex.getMessage());
+        ErrorResponse error = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.SERVICE_UNAVAILABLE.value(),
+                "User Service Error",
+                ex.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
+    }
+
+    @ExceptionHandler(SpacecraftServiceException.class)
+    public ResponseEntity<ErrorResponse> handleSpacecraftServiceException(SpacecraftServiceException ex) {
+        log.error("User service error: {}", ex.getMessage());
+        ErrorResponse error = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.SERVICE_UNAVAILABLE.value(),
+                "Spacecraft Service Error",
+                ex.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
     }
 
     @ExceptionHandler(Exception.class)
