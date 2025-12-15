@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 public class UserServiceClientFallback implements UserServiceClient {
 
     @Override
-    public String getUsernameById(Long id) {
+    public String getUserById(Long id) {
         log.warn("Fallback: Unable to fetch username for user id: {}", id);
         return "Unknown User";
     }

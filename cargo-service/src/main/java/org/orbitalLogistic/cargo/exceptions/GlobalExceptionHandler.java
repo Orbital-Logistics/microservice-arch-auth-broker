@@ -62,6 +62,30 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException ex) {
+        log.warn("User with ID not found: {}", ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+                ex.getMessage(),
+                "Not Found",
+                HttpStatus.NOT_FOUND.value(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(UserServiceException.class)
+    public ResponseEntity<ErrorResponse> handleUserServiceException(UserServiceException ex) {
+        log.warn("User with ID not found: {}", ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+                ex.getMessage(),
+                "Server unavailable",
+                HttpStatus.SERVICE_UNAVAILABLE.value(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponse);
+    }
+
     @ExceptionHandler(StorageUnitAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleStorageUnitAlreadyExistsException(StorageUnitAlreadyExistsException ex) {
         log.warn("Storage unit already exists: {}", ex.getMessage());

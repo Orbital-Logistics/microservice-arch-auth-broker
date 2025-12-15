@@ -180,6 +180,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
   maintenance-service:
     build: ./maintenance-service
     container_name: maintenance-service

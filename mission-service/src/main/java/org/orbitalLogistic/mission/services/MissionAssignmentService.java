@@ -3,6 +3,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.orbitalLogistic.mission.clients.UserDTO;
 import org.orbitalLogistic.mission.clients.UserServiceClient;
+import org.orbitalLogistic.mission.clients.resilient.ResilientUserService;
 import org.orbitalLogistic.mission.dto.common.PageResponseDTO;
 import org.orbitalLogistic.mission.dto.request.MissionAssignmentRequestDTO;
 import org.orbitalLogistic.mission.dto.response.MissionAssignmentResponseDTO;
@@ -26,7 +27,7 @@ public class MissionAssignmentService {
     private final MissionAssignmentRepository missionAssignmentRepository;
     private final MissionRepository missionRepository;
     private final MissionAssignmentMapper missionAssignmentMapper;
-    private final UserServiceClient userServiceClient;
+    private final ResilientUserService userServiceClient;
 
     public PageResponseDTO<MissionAssignmentResponseDTO> getAllAssignments(int page, int size) {
         int offset = page * size;
