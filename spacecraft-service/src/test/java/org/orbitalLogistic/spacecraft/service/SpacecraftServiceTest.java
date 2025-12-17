@@ -7,8 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.orbitalLogistic.spacecraft.clients.CargoServiceClient;
-import org.orbitalLogistic.spacecraft.clients.SpacecraftCargoUsageDTO;
 import org.orbitalLogistic.spacecraft.dto.common.PageResponseDTO;
 import org.orbitalLogistic.spacecraft.dto.request.SpacecraftRequestDTO;
 import org.orbitalLogistic.spacecraft.dto.response.SpacecraftResponseDTO;
@@ -44,9 +42,6 @@ class SpacecraftServiceTest {
 
     @Mock
     private JdbcTemplate jdbcTemplate;
-
-    @Mock
-    private CargoServiceClient cargoServiceClient;
 
     @Mock
     private SpacecraftTypeService spacecraftTypeService;
@@ -114,8 +109,6 @@ class SpacecraftServiceTest {
                 .thenReturn(spacecrafts);
         when(spacecraftRepository.countWithFilters(anyString(), anyString())).thenReturn(1L);
         when(spacecraftTypeService.getEntityById(anyLong())).thenReturn(testSpacecraftType);
-        when(cargoServiceClient.getSpacecraftCargoUsage(anyLong()))
-                .thenReturn(new SpacecraftCargoUsageDTO(1L, BigDecimal.ZERO, BigDecimal.ZERO));
         when(spacecraftMapper.toResponseDTO(any(Spacecraft.class), any(), any(), any(), any()))
                 .thenReturn(spacecraftResponse);
 
@@ -137,8 +130,6 @@ class SpacecraftServiceTest {
     void getSpacecraftById_Success() {
         when(spacecraftRepository.findById(1L)).thenReturn(Optional.of(testSpacecraft));
         when(spacecraftTypeService.getEntityById(anyLong())).thenReturn(testSpacecraftType);
-        when(cargoServiceClient.getSpacecraftCargoUsage(1L))
-                .thenReturn(new SpacecraftCargoUsageDTO(1L, BigDecimal.ZERO, BigDecimal.ZERO));
         when(spacecraftMapper.toResponseDTO(any(Spacecraft.class), any(), any(), any(), any()))
                 .thenReturn(spacecraftResponse);
 
@@ -169,8 +160,6 @@ class SpacecraftServiceTest {
         when(jdbcTemplate.queryForObject(anyString(), eq(Long.class),
                 any(), any(), any(), any(), any(), any(), any())).thenReturn(2L);
         when(spacecraftRepository.findById(2L)).thenReturn(Optional.of(testSpacecraft));
-        when(cargoServiceClient.getSpacecraftCargoUsage(anyLong()))
-                .thenReturn(new SpacecraftCargoUsageDTO(2L, BigDecimal.ZERO, BigDecimal.ZERO));
         when(spacecraftMapper.toResponseDTO(any(Spacecraft.class), any(), any(), any(), any()))
                 .thenReturn(spacecraftResponse);
 
@@ -203,8 +192,6 @@ class SpacecraftServiceTest {
         when(spacecraftTypeService.getEntityById(1L)).thenReturn(testSpacecraftType);
         when(jdbcTemplate.update(anyString(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(1);
-        when(cargoServiceClient.getSpacecraftCargoUsage(anyLong()))
-                .thenReturn(new SpacecraftCargoUsageDTO(1L, BigDecimal.ZERO, BigDecimal.ZERO));
         when(spacecraftMapper.toResponseDTO(any(Spacecraft.class), any(), any(), any(), any()))
                 .thenReturn(spacecraftResponse);
 
@@ -235,8 +222,6 @@ class SpacecraftServiceTest {
         List<Spacecraft> spacecrafts = List.of(testSpacecraft);
         when(spacecraftRepository.findAvailableForMission()).thenReturn(spacecrafts);
         when(spacecraftTypeService.getEntityById(anyLong())).thenReturn(testSpacecraftType);
-        when(cargoServiceClient.getSpacecraftCargoUsage(anyLong()))
-                .thenReturn(new SpacecraftCargoUsageDTO(1L, BigDecimal.ZERO, BigDecimal.ZERO));
         when(spacecraftMapper.toResponseDTO(any(Spacecraft.class), any(), any(), any(), any()))
                 .thenReturn(spacecraftResponse);
 
@@ -254,8 +239,6 @@ class SpacecraftServiceTest {
         when(spacecraftRepository.findById(1L)).thenReturn(Optional.of(testSpacecraft));
         when(spacecraftTypeService.getEntityById(anyLong())).thenReturn(testSpacecraftType);
         when(jdbcTemplate.update(anyString(), anyString(), anyLong())).thenReturn(1);
-        when(cargoServiceClient.getSpacecraftCargoUsage(anyLong()))
-                .thenReturn(new SpacecraftCargoUsageDTO(1L, BigDecimal.ZERO, BigDecimal.ZERO));
         when(spacecraftMapper.toResponseDTO(any(Spacecraft.class), any(), any(), any(), any()))
                 .thenReturn(spacecraftResponse);
 
@@ -298,8 +281,6 @@ class SpacecraftServiceTest {
         when(spacecraftRepository.findWithFilters(isNull(), isNull(), eq(11), eq(0)))
                 .thenReturn(spacecrafts);
         when(spacecraftTypeService.getEntityById(anyLong())).thenReturn(testSpacecraftType);
-        when(cargoServiceClient.getSpacecraftCargoUsage(anyLong()))
-                .thenReturn(new SpacecraftCargoUsageDTO(1L, BigDecimal.ZERO, BigDecimal.ZERO));
         when(spacecraftMapper.toResponseDTO(any(Spacecraft.class), any(), any(), any(), any()))
                 .thenReturn(spacecraftResponse);
 
