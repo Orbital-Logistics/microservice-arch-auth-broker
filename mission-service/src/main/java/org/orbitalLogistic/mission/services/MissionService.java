@@ -2,10 +2,7 @@ package org.orbitalLogistic.mission.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.orbitalLogistic.mission.clients.SpacecraftDTO;
-import org.orbitalLogistic.mission.clients.SpacecraftServiceClient;
 import org.orbitalLogistic.mission.clients.UserDTO;
-import org.orbitalLogistic.mission.clients.UserServiceClient;
 import org.orbitalLogistic.mission.clients.resilient.ResilientSpacecraftService;
 import org.orbitalLogistic.mission.clients.resilient.ResilientUserService;
 import org.orbitalLogistic.mission.dto.common.PageResponseDTO;
@@ -16,7 +13,7 @@ import org.orbitalLogistic.mission.entities.enums.MissionStatus;
 import org.orbitalLogistic.mission.exceptions.InvalidOperationException;
 import org.orbitalLogistic.mission.exceptions.MissionAlreadyExistsException;
 import org.orbitalLogistic.mission.exceptions.MissionNotFoundException;
-import org.orbitalLogistic.mission.exceptions.UserServiceException;
+import org.orbitalLogistic.mission.exceptions.SpacecraftServiceNotFound;
 import org.orbitalLogistic.mission.exceptions.UserServiceNotFound;
 import org.orbitalLogistic.mission.mappers.MissionMapper;
 import org.orbitalLogistic.mission.repositories.MissionAssignmentRepository;
@@ -74,10 +71,12 @@ public class MissionService {
         }
         // Проверяем результат!
         Boolean userExists = userServiceClient.userExists(request.commandingOfficerId());
-        spacecraftServiceClient.getSpacecraftById(request.spacecraftId());
-        
         if (userExists == null || !userExists) {
-            throw new InvalidOperationException("Commanding officer not found with id: " + request.commandingOfficerId());
+            throw new UserServiceNotFound("Commanding officer not found with id: " + request.commandingOfficerId());
+        }
+        Boolean isExist = spacecraftServiceClient.spacecraftExists(request.spacecraftId());
+        if (!isExist) {
+            throw new SpacecraftServiceNotFound("Spacecraft with ID " + request.spacecraftId() + " doesn't exists");
         }
 
         Mission mission = missionMapper.toEntity(request);
@@ -163,23 +162,10 @@ public class MissionService {
         String commanderName = "Unknown";
         String spacecraftName = "Unknown";
 
-        // try {
         UserDTO user = userServiceClient.getUserById(mission.getCommandingOfficerId());
         if (user != null) {
             commanderName = user.username();
         }
-        // } catch (Exception e) {
-        //     log.warn("Failed to fetch commander name for mission {}: {}", mission.getId(), e.getMessage());
-        // }
-
-        // try {
-        SpacecraftDTO spacecraft = spacecraftServiceClient.getSpacecraftById(mission.getSpacecraftId());
-        if (spacecraft != null) {
-            spacecraftName = spacecraft.name();
-        }
-        // } catch (Exception e) {
-        //     log.warn("Failed to fetch spacecraft name for mission {}: {}", mission.getId(), e.getMessage());
-        // }
 
         Integer crewCount = missionAssignmentRepository.countByMissionId(mission.getId());
 

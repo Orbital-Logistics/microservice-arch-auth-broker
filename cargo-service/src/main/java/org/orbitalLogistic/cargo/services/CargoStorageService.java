@@ -11,6 +11,7 @@ import org.orbitalLogistic.cargo.entities.StorageUnit;
 import org.orbitalLogistic.cargo.exceptions.CargoStorageNotFoundException;
 import org.orbitalLogistic.cargo.exceptions.InsufficientCapacityException;
 import org.orbitalLogistic.cargo.exceptions.StorageUnitNotFoundException;
+import org.orbitalLogistic.cargo.exceptions.UserNotFoundException;
 import org.orbitalLogistic.cargo.mappers.CargoStorageMapper;
 import org.orbitalLogistic.cargo.repositories.CargoRepository;
 import org.orbitalLogistic.cargo.repositories.CargoStorageRepository;
@@ -31,7 +32,6 @@ public class CargoStorageService {
     private final CargoRepository cargoRepository;
     private final StorageUnitRepository storageUnitRepository;
     private final ResilientUserService userServiceClient;
-    // private final UserServiceClient userServiceClient;
 
     public PageResponseDTO<CargoStorageResponseDTO> getAllCargoStorage(int page, int size) {
         int offset = page * size;
@@ -53,8 +53,10 @@ public class CargoStorageService {
         Cargo cargo = cargoRepository.findById(request.cargoId())
                 .orElseThrow(() -> new CargoStorageNotFoundException("Cargo not found"));
         
-        userServiceClient.getUserById(request.updatedByUserId());
-
+        Boolean userExists = userServiceClient.userExists(request.updatedByUserId());
+        if (userExists == null || !userExists) {
+            throw new UserNotFoundException("updatedByUserId not found with id: " + request.updatedByUserId());
+        }
         BigDecimal requiredMass = cargo.getMassPerUnit().multiply(BigDecimal.valueOf(request.quantity()));
         BigDecimal requiredVolume = cargo.getVolumePerUnit().multiply(BigDecimal.valueOf(request.quantity()));
 

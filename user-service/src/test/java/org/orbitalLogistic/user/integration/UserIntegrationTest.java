@@ -2,6 +2,7 @@ package org.orbitalLogistic.user.integration;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.orbitalLogistic.user.dto.request.UpdateUserRequestDTO;
 import org.orbitalLogistic.user.dto.request.UserRegistrationRequestDTO;
@@ -25,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureWebTestClient
 @Import(TestcontainersConfiguration.class)
 @ActiveProfiles("test")
+@Tag("integration-tests")
 @TestPropertySource(properties = {
         "spring.cloud.config.enabled=false"
 })

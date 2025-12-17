@@ -2,6 +2,7 @@ package org.orbitalLogistic.user.repository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.orbitalLogistic.user.entities.User;
 import org.orbitalLogistic.user.entities.UserRole;
@@ -23,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import(TestcontainersConfiguration.class)
 @ActiveProfiles("test")
+@Tag("integration-tests")
 class UserRepositoryTest {
 
     @Autowired

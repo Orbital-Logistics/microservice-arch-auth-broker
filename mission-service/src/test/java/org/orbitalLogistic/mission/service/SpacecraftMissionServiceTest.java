@@ -8,7 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.orbitalLogistic.mission.clients.SpacecraftDTO;
-import org.orbitalLogistic.mission.clients.SpacecraftServiceClient;
+import org.orbitalLogistic.mission.clients.resilient.ResilientSpacecraftService;
 import org.orbitalLogistic.mission.dto.request.SpacecraftMissionRequestDTO;
 import org.orbitalLogistic.mission.dto.response.SpacecraftMissionResponseDTO;
 import org.orbitalLogistic.mission.entities.Mission;
@@ -44,7 +44,7 @@ class SpacecraftMissionServiceTest {
     private SpacecraftMissionMapper spacecraftMissionMapper;
 
     @Mock
-    private SpacecraftServiceClient spacecraftServiceClient;
+    private ResilientSpacecraftService spacecraftServiceClient;
 
     @InjectMocks
     private SpacecraftMissionService spacecraftMissionService;

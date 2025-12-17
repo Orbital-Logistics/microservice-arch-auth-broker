@@ -18,8 +18,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.beans.BeanInfo;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -97,12 +95,13 @@ public class MaintenanceLogService {
                 request.supervisedByUserId() == null
                     ? Mono.just(true)
                     : userServiceClient.userExists(request.supervisedByUserId())
+                        .doOnError(ex -> log.error("Failed to validate supervised by user: {}", ex.getMessage()))
+                        .onErrorMap(ex -> !(ex instanceof InvalidOperationException), 
+                                ex -> new InvalidOperationException("Unable to validate supervised by user. User service may be unavailable."))
                         .flatMap(exists -> exists
                             ? Mono.just(true)
                             : Mono.error(new InvalidOperationException("Supervised by user not found with id: " + request.supervisedByUserId()))
-                        )
-                        .doOnError(ex -> log.error("Failed to validate supervised by user: {}", ex.getMessage()))
-                        .onErrorMap(ex -> new InvalidOperationException("Unable to validate supervised by user. User service may be unavailable."));
+                        );
 
         return Mono.zip(spacecraftExists, userExists, supervisedExists)
                 .then(Mono.fromSupplier(() -> maintenanceLogMapper.toEntity(request)))

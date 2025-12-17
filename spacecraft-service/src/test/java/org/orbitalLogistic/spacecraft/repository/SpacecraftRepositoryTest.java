@@ -2,6 +2,7 @@ package org.orbitalLogistic.spacecraft.repository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.orbitalLogistic.spacecraft.TestcontainersConfiguration;
 import org.orbitalLogistic.spacecraft.entities.Spacecraft;
@@ -26,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import(TestcontainersConfiguration.class)
 @ActiveProfiles("test")
+@Tag("integration-tests")
 class SpacecraftRepositoryTest {
 
     @Autowired

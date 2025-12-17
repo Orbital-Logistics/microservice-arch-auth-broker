@@ -38,19 +38,15 @@ public class SpacecraftServiceClient {
                 circuitBreakerRegistry.circuitBreaker("spacecraftService")
             ))
             .doOnError(e -> log.error("Error calling spacecraft-service: {}", e.getMessage()))
-            // Обработка 404 - Spacecraft не найден
             .onErrorResume(WebClientResponseException.NotFound.class, e -> {
                 log.warn("Spacecraft id {} not found", id);
-                // Возвращаем fallback SpacecraftDTO
                 return Mono.empty();
             })
-            // Обработка других ошибок 4xx/5xx
             .onErrorResume(WebClientResponseException.class, e -> {
                 log.error("HTTP error {} when calling spacecraft-service: {}",
                         e.getStatusCode(), e.getMessage());
                 return fallback.getSpacecraftById(id, e);
             })
-            // Общий fallback для всех остальных ошибок
             .onErrorResume(e -> {
                 log.error("Unexpected error calling spacecraft-service: {}", e.getMessage());
                 return fallback.getSpacecraftById(id, e);

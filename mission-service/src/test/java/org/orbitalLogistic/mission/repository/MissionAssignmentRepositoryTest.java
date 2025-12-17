@@ -2,6 +2,7 @@ package org.orbitalLogistic.mission.repository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.orbitalLogistic.mission.TestcontainersConfiguration;
 import org.orbitalLogistic.mission.entities.Mission;
@@ -26,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import(TestcontainersConfiguration.class)
 @ActiveProfiles("test")
+@Tag("integration-tests")
 @TestPropertySource(properties = {
         "spring.cloud.config.enabled=false"
 })

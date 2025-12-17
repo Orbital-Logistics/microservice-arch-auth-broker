@@ -28,7 +28,7 @@ public class ResilientCargoServiceClient {
 
     public CargoDTO getCargoByIdFallback(Long id, Throwable t) {
         log.error("FALLBACK getCargoById! status: {}, error: {}", id, t.getClass().getSimpleName());
-        throw new CargoServiceException("Cargo Service service unavailable!");
+        throw new CargoServiceException("Cargo Service unavailable!");
     }
 
     @CircuitBreaker(name = "cargoService", fallbackMethod = "cargoExistsFallback")
@@ -42,7 +42,7 @@ public class ResilientCargoServiceClient {
 
     public Boolean cargoExistsFallback(Long id, Throwable t) {
         log.error("FALLBACK cargoExists! status: {}, error: {}", id, t.getClass().getSimpleName());
-        throw new CargoServiceException("Cargo Service  unavailable!");
+        throw new CargoServiceException("Cargo Service unavailable!");
     }
 
     @CircuitBreaker(name = "cargoService", fallbackMethod = "getStorageUnitByIdFallback")
@@ -56,7 +56,7 @@ public class ResilientCargoServiceClient {
 
     public StorageUnitDTO getStorageUnitByIdFallback(Long id, Throwable t) {
         log.error("FALLBACK getStorageUnitById! status: {}, error: {}", id, t.getClass().getSimpleName());
-        throw new CargoServiceException("Cargo Service  unavailable!");
+        throw new CargoServiceException("Cargo Service unavailable!");
     }
 
     @CircuitBreaker(name = "cargoService", fallbackMethod = "storageUnitExistsFallback")
@@ -70,6 +70,6 @@ public class ResilientCargoServiceClient {
 
     public Boolean storageUnitExistsFallback(Long id, Throwable t) {
         log.error("FALLBACK storageUnitExists! status: {}, error: {}", id, t.getClass().getSimpleName());
-        throw new CargoServiceException("Cargo Service  unavailable!");
+        throw new CargoServiceException("Cargo Service unavailable!");
     }
 }

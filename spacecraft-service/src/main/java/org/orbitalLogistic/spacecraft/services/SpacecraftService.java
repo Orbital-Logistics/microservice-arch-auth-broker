@@ -2,6 +2,7 @@ package org.orbitalLogistic.spacecraft.services;
 
 import lombok.extern.slf4j.Slf4j;
 import org.orbitalLogistic.spacecraft.clients.CargoServiceClient;
+import org.orbitalLogistic.spacecraft.clients.ResilientCargoServiceClient;
 import org.orbitalLogistic.spacecraft.clients.SpacecraftCargoUsageDTO;
 import org.orbitalLogistic.spacecraft.dto.common.PageResponseDTO;
 import org.orbitalLogistic.spacecraft.dto.request.SpacecraftRequestDTO;
@@ -31,14 +32,14 @@ public class SpacecraftService {
     private final SpacecraftRepository spacecraftRepository;
     private final SpacecraftMapper spacecraftMapper;
     private final JdbcTemplate jdbcTemplate;
-    private final CargoServiceClient cargoServiceClient;
+    private final ResilientCargoServiceClient cargoServiceClient;
 
     private SpacecraftTypeService spacecraftTypeService;
 
     public SpacecraftService(SpacecraftRepository spacecraftRepository,
                             SpacecraftMapper spacecraftMapper,
                             JdbcTemplate jdbcTemplate,
-                            CargoServiceClient cargoServiceClient) {
+                            ResilientCargoServiceClient cargoServiceClient) {
         this.spacecraftRepository = spacecraftRepository;
         this.spacecraftMapper = spacecraftMapper;
         this.jdbcTemplate = jdbcTemplate;

@@ -8,7 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.orbitalLogistic.mission.clients.UserDTO;
-import org.orbitalLogistic.mission.clients.UserServiceClient;
+import org.orbitalLogistic.mission.clients.resilient.ResilientUserService;
 import org.orbitalLogistic.mission.dto.common.PageResponseDTO;
 import org.orbitalLogistic.mission.dto.request.MissionAssignmentRequestDTO;
 import org.orbitalLogistic.mission.dto.response.MissionAssignmentResponseDTO;
@@ -47,7 +47,7 @@ class MissionAssignmentServiceTest {
     private MissionAssignmentMapper missionAssignmentMapper;
 
     @Mock
-    private UserServiceClient userServiceClient;
+    private ResilientUserService userServiceClient;
 
     @InjectMocks
     private MissionAssignmentService missionAssignmentService;

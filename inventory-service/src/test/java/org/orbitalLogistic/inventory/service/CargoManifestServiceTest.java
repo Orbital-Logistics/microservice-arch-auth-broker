@@ -8,6 +8,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.orbitalLogistic.inventory.clients.*;
+import org.orbitalLogistic.inventory.clients.resilient.ResilientCargoServiceClient;
+import org.orbitalLogistic.inventory.clients.resilient.ResilientSpacecraftService;
+import org.orbitalLogistic.inventory.clients.resilient.ResilientUserService;
 import org.orbitalLogistic.inventory.dto.common.PageResponseDTO;
 import org.orbitalLogistic.inventory.dto.request.CargoManifestRequestDTO;
 import org.orbitalLogistic.inventory.dto.response.CargoManifestResponseDTO;
@@ -38,13 +41,13 @@ class CargoManifestServiceTest {
     private CargoManifestMapper cargoManifestMapper;
 
     @Mock
-    private UserServiceClient userServiceClient;
+    private ResilientUserService userServiceClient;
 
     @Mock
-    private CargoServiceClient cargoServiceClient;
+    private ResilientCargoServiceClient cargoServiceClient;
 
     @Mock
-    private SpacecraftServiceClient spacecraftServiceClient;
+    private ResilientSpacecraftService spacecraftServiceClient;
 
     @InjectMocks
     private CargoManifestService cargoManifestService;

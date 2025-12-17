@@ -239,10 +239,10 @@ class SpacecraftControllerTest {
                 .thenReturn(updatedResponse);
 
         mockMvc.perform(put("/api/spacecrafts/1/status")
-                        .param("status", "IN_MISSION"))
+                        .param("status", "IN_TRANSIT"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.status").value("IN_MISSION"));
+                .andExpect(jsonPath("$.status").value("IN_TRANSIT"));
 
         verify(spacecraftService).updateSpacecraftStatus(1L, SpacecraftStatus.IN_TRANSIT);
     }

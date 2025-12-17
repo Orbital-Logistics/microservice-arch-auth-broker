@@ -3,11 +3,11 @@ package org.orbitalLogistic.mission.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.orbitalLogistic.mission.TestcontainersConfiguration;
-import org.orbitalLogistic.mission.clients.UserServiceClient;
+import org.orbitalLogistic.mission.clients.resilient.ResilientUserService;
 import org.orbitalLogistic.mission.dto.request.MissionAssignmentRequestDTO;
-import org.orbitalLogistic.mission.dto.request.MissionRequestDTO;
 import org.orbitalLogistic.mission.entities.Mission;
 import org.orbitalLogistic.mission.entities.enums.AssignmentRole;
 import org.orbitalLogistic.mission.entities.enums.MissionPriority;
@@ -37,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Import(TestcontainersConfiguration.class)
 @ActiveProfiles("test")
+@Tag("integration-tests")
 @TestPropertySource(properties = {
         "spring.cloud.config.enabled=false"
 })
@@ -55,7 +56,7 @@ class MissionAssignmentIntegrationTest {
     private MissionRepository missionRepository;
 
     @MockitoBean
-    private UserServiceClient userServiceClient;
+    private ResilientUserService userServiceClient;
 
     private Mission testMission;
 
@@ -102,11 +103,11 @@ class MissionAssignmentIntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        Long assignmentId = objectMapper.readTree(createdResponse).get("id").asLong();
+        long assignmentId = objectMapper.readTree(createdResponse).get("id").asLong();
 
         mockMvc.perform(get("/api/mission-assignments/" + assignmentId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(assignmentId.intValue())))
+                .andExpect(jsonPath("$.id", is((int) assignmentId)))
                 .andExpect(jsonPath("$.assignmentRole", is("PILOT")));
 
         mockMvc.perform(get("/api/mission-assignments")
@@ -114,7 +115,7 @@ class MissionAssignmentIntegrationTest {
                         .param("size", "20"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(1)))
-                .andExpect(jsonPath("$.content[0].id", is(assignmentId.intValue())));
+                .andExpect(jsonPath("$.content[0].id", is((int) assignmentId)));
 
         mockMvc.perform(delete("/api/mission-assignments/" + assignmentId))
                 .andExpect(status().isNoContent());

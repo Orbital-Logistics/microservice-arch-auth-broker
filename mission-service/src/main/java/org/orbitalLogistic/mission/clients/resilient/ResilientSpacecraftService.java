@@ -3,6 +3,7 @@ package org.orbitalLogistic.mission.clients.resilient;
 import org.orbitalLogistic.mission.clients.SpacecraftDTO;
 import org.orbitalLogistic.mission.clients.SpacecraftServiceClient;
 import org.orbitalLogistic.mission.exceptions.SpacecraftServiceException;
+import org.orbitalLogistic.mission.exceptions.SpacecraftServiceNotFound;
 import org.springframework.stereotype.Service;
 
 import feign.FeignException;
@@ -21,7 +22,7 @@ public class ResilientSpacecraftService {
         try{
             return spacecraftServiceApi.getSpacecraftById(id);
         } catch (FeignException.NotFound e) {
-            throw new SpacecraftServiceException("Spacecraft with ID " + id + " not found");
+            throw new SpacecraftServiceNotFound("Spacecraft with ID " + id + " not found");
         }
     }
 
@@ -39,19 +40,18 @@ public class ResilientSpacecraftService {
         try {
             return spacecraftServiceApi.spacecraftExists(id);
         } catch (FeignException.NotFound e) {
-            throw new SpacecraftServiceException("Spacecraft with ID " + id + " not found");
+            throw new SpacecraftServiceNotFound("Spacecraft with ID " + id + " not found");
         }
     }
     
     public Boolean spacecraftExistsFallback(Long id, Throwable t) {
         log.error("Fallback for spacecraftExists ID: {}. Error: {}", id, t.getMessage());
         
-        // For network issues, return false instead of throwing exception
         if (t instanceof java.net.NoRouteToHostException || 
             t instanceof java.net.UnknownHostException) {
-            return false; // Or true, depending on your business logic
+            return false;
         }
-        
+
         throw new SpacecraftServiceException("Spacecraft Service unavailable!");
     }
 }

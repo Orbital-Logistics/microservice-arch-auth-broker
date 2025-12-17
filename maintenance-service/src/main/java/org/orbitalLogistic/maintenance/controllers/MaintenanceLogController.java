@@ -46,7 +46,7 @@ public class MaintenanceLogController {
     @PutMapping("/maintenance-logs/{id}/status")
     public Mono<ResponseEntity<MaintenanceLogResponseDTO>> updateMaintenanceStatus(
             @PathVariable Long id,
-            @Valid @RequestBody MaintenanceLogRequestDTO request) {
+            @RequestBody MaintenanceLogRequestDTO request) {
 
         return maintenanceLogService.updateMaintenanceStatus(id, request)
                 .map(ResponseEntity::ok);

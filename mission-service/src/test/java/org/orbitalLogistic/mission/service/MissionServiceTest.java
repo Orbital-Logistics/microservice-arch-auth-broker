@@ -8,9 +8,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.orbitalLogistic.mission.clients.SpacecraftDTO;
-import org.orbitalLogistic.mission.clients.SpacecraftServiceClient;
 import org.orbitalLogistic.mission.clients.UserDTO;
-import org.orbitalLogistic.mission.clients.UserServiceClient;
+import org.orbitalLogistic.mission.clients.resilient.ResilientSpacecraftService;
+import org.orbitalLogistic.mission.clients.resilient.ResilientUserService;
 import org.orbitalLogistic.mission.dto.common.PageResponseDTO;
 import org.orbitalLogistic.mission.dto.request.MissionRequestDTO;
 import org.orbitalLogistic.mission.dto.response.MissionResponseDTO;
@@ -47,10 +47,10 @@ class MissionServiceTest {
     private MissionMapper missionMapper;
 
     @Mock
-    private UserServiceClient userServiceClient;
+    private ResilientUserService userServiceClient;
 
     @Mock
-    private SpacecraftServiceClient spacecraftServiceClient;
+    private ResilientSpacecraftService spacecraftServiceClient;
 
     @InjectMocks
     private MissionService missionService;
@@ -185,11 +185,10 @@ class MissionServiceTest {
     void createMission_Success() {
         when(missionRepository.existsByMissionCode(anyString())).thenReturn(false);
         when(userServiceClient.userExists(anyLong())).thenReturn(true);
-        when(spacecraftServiceClient.spacecraftExists(anyLong())).thenReturn(true);
+        when(spacecraftServiceClient.getSpacecraftById(anyLong())).thenReturn(testSpacecraft);
         when(missionMapper.toEntity(any(MissionRequestDTO.class))).thenReturn(testMission);
         when(missionRepository.save(any(Mission.class))).thenReturn(testMission);
         when(userServiceClient.getUserById(anyLong())).thenReturn(testUser);
-        when(spacecraftServiceClient.getSpacecraftById(anyLong())).thenReturn(testSpacecraft);
         when(missionAssignmentRepository.countByMissionId(anyLong())).thenReturn(0);
         when(missionMapper.toResponseDTO(any(Mission.class), anyString(), anyString(), anyInt()))
                 .thenReturn(missionResponse);
@@ -200,7 +199,7 @@ class MissionServiceTest {
 
         verify(missionRepository).existsByMissionCode(missionRequest.missionCode());
         verify(userServiceClient).userExists(missionRequest.commandingOfficerId());
-        verify(spacecraftServiceClient).spacecraftExists(missionRequest.spacecraftId());
+        verify(spacecraftServiceClient).getSpacecraftById(missionRequest.spacecraftId());
         verify(missionRepository).save(any(Mission.class));
     }
 
@@ -234,12 +233,13 @@ class MissionServiceTest {
     void createMission_SpacecraftNotFound() {
         when(missionRepository.existsByMissionCode(anyString())).thenReturn(false);
         when(userServiceClient.userExists(anyLong())).thenReturn(true);
-        when(spacecraftServiceClient.spacecraftExists(anyLong())).thenReturn(false);
+        when(spacecraftServiceClient.getSpacecraftById(anyLong()))
+                .thenThrow(new org.orbitalLogistic.mission.exceptions.SpacecraftServiceException("Spacecraft with ID " + missionRequest.spacecraftId() + " not found"));
 
-        assertThrows(InvalidOperationException.class,
+        assertThrows(org.orbitalLogistic.mission.exceptions.SpacecraftServiceException.class,
                 () -> missionService.createMission(missionRequest));
 
-        verify(spacecraftServiceClient).spacecraftExists(missionRequest.spacecraftId());
+        verify(spacecraftServiceClient).getSpacecraftById(missionRequest.spacecraftId());
         verify(missionRepository, never()).save(any());
     }
 

@@ -3,6 +3,7 @@ package org.orbitalLogistic.mission.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.orbitalLogistic.mission.TestcontainersConfiguration;
 import org.orbitalLogistic.mission.dto.request.SpacecraftMissionRequestDTO;
@@ -31,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Import(TestcontainersConfiguration.class)
 @ActiveProfiles("test")
+@Tag("integration-tests")
 @TestPropertySource(properties = {
         "spring.cloud.config.enabled=false"
 })

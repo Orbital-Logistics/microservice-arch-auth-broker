@@ -4,7 +4,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "spacecraft-service", path = "/api/spacecrafts", fallback = SpacecraftServiceClientFallback.class)
+@FeignClient(name = "spacecraft-service", path = "/api/spacecrafts")
 public interface SpacecraftServiceClient {
 
     @GetMapping("/{id}")

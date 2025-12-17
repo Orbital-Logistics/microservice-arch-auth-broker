@@ -26,7 +26,7 @@ public class ResilientSpacecraftService {
     }
 
     public SpacecraftDTO getSpacecraftByIdFallback(Long id, Throwable t) {
-        log.error("FALLBACK getCargoById! status: {}, error: {}", id, t.getClass().getSimpleName());
+        log.error("FALLBACK getSpacecraftById! status: {}, error: {}", id, t.getClass().getSimpleName());
         throw new SpacecraftServiceException("Cargo Service service unavailable!");
     }
 
@@ -35,12 +35,12 @@ public class ResilientSpacecraftService {
         try {
             return spacecraftServiceApi.spacecraftExists(id);
         } catch (FeignException.NotFound e) {
-            throw new SpacecraftServiceException("Cargo with ID " + id + " not found");
+            throw new SpacecraftServiceException("Spacecraft with ID " + id + " not found");
         }
     }
 
     public Boolean spacecraftExistsFallback(Long id, Throwable t) {
         log.error("FALLBACK cargoExists! status: {}, error: {}", id, t.getClass().getSimpleName());
-        throw new SpacecraftServiceException("Cargo Service  unavailable!");
+        throw new SpacecraftServiceException("Spacecraft Service unavailable!");
     }
 }

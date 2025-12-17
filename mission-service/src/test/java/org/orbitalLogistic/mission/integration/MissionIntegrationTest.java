@@ -3,10 +3,11 @@ package org.orbitalLogistic.mission.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.orbitalLogistic.mission.TestcontainersConfiguration;
-import org.orbitalLogistic.mission.clients.SpacecraftServiceClient;
-import org.orbitalLogistic.mission.clients.UserServiceClient;
+import org.orbitalLogistic.mission.clients.resilient.ResilientSpacecraftService;
+import org.orbitalLogistic.mission.clients.resilient.ResilientUserService;
 import org.orbitalLogistic.mission.dto.request.MissionRequestDTO;
 import org.orbitalLogistic.mission.entities.enums.MissionPriority;
 import org.orbitalLogistic.mission.entities.enums.MissionType;
@@ -33,6 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Import(TestcontainersConfiguration.class)
 @ActiveProfiles("test")
+@Tag("integration-tests")
 @TestPropertySource(properties = {
         "spring.cloud.config.enabled=false"
 })
@@ -48,10 +50,10 @@ class MissionIntegrationTest {
     private MissionRepository missionRepository;
 
     @MockitoBean
-    private UserServiceClient userServiceClient;
+    private ResilientUserService userServiceClient;
 
     @MockitoBean
-    private SpacecraftServiceClient spacecraftServiceClient;
+    private ResilientSpacecraftService spacecraftServiceClient;
 
     @BeforeEach
     void setUp() {
@@ -86,11 +88,11 @@ class MissionIntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        Long missionId = objectMapper.readTree(createdResponse).get("id").asLong();
+        long missionId = objectMapper.readTree(createdResponse).get("id").asLong();
 
         mockMvc.perform(get("/api/missions/" + missionId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(missionId.intValue())))
+                .andExpect(jsonPath("$.id", is((int) missionId)))
                 .andExpect(jsonPath("$.missionCode", is("INT-001")))
                 .andExpect(jsonPath("$.missionName", is("Integration Test Mission")));
 
@@ -130,7 +132,7 @@ class MissionIntegrationTest {
                 .getResponse()
                 .getContentAsString();
 
-        Long missionId = objectMapper.readTree(createdResponse).get("id").asLong();
+        long missionId = objectMapper.readTree(createdResponse).get("id").asLong();
 
         MissionRequestDTO updateRequest = new MissionRequestDTO(
                 LocalDateTime.now().plusDays(12),

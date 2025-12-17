@@ -29,6 +29,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
+    @ExceptionHandler(SpacecraftServiceNotFound.class)
+    public ResponseEntity<ErrorResponse> handleSpacecraftServiceNotFound(SpacecraftServiceNotFound ex) {
+        log.warn("Spacecraft not found: {}", ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+            LocalDateTime.now(),
+            HttpStatus.NOT_FOUND.value(),
+            "Not Found",
+            ex.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
     @ExceptionHandler(UserServiceNotFound.class)
     public ResponseEntity<ErrorResponse> handleUserServiceNotFound(UserServiceNotFound ex) {
         log.warn("User not found with id: {}", ex.getMessage());
@@ -126,7 +138,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(SpacecraftServiceException.class)
     public ResponseEntity<ErrorResponse> handleSpacecraftServiceException(SpacecraftServiceException ex) {
-        log.error("User service error: {}", ex.getMessage());
+        log.error("Spacecraft service error: {}", ex.getMessage());
         ErrorResponse error = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.SERVICE_UNAVAILABLE.value(),

@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ResilientUserService {
     private final UserServiceClient userServiceApi;
 
-    @CircuitBreaker(name = "userService", fallbackMethod = "getUsernameByIdFallback")
+    @CircuitBreaker(name = "userService", fallbackMethod = "getUserByIdFallback")
     public String getUserById(Long id) {
         try {
             return userServiceApi.getUserById(id);
@@ -24,8 +24,21 @@ public class ResilientUserService {
         }
     }
 
-    public String getUsernameByIdFallback(Long id, Throwable t) {
+    public String getUserByIdFallback(Long id, Throwable t) {
         log.error("FALLBACK getUsernameById! status: {}, error: {}", id, t.getClass().getSimpleName());
         throw new UserServiceException("User service unavailable!");
+    }
+
+    @CircuitBreaker(name = "userService", fallbackMethod = "userExistsFallback")
+    public Boolean userExists(Long id) {
+        return userServiceApi.userExists(id);
+    }
+
+    public Boolean userExistsFallback(Long id, Throwable t) {
+        log.error("FALLBACK userExists! userId: {}, error: {}", id, t.getClass().getSimpleName());
+        if (!(t instanceof UserServiceException && t.getMessage().contains("not found"))) {
+            throw new UserServiceException("User service unavailable", t);
+        }
+        throw (UserServiceException) t;
     }
 }
