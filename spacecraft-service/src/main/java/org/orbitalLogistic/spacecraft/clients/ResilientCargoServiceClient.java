@@ -36,6 +36,8 @@ public class ResilientCargoServiceClient {
             return supplier.get();
         } catch (CallNotPermittedException e) {
             return getSpacecraftCargoUsageFallback(spacecraftId, e);
+        } catch (FeignException.NotFound e) {
+            throw new SpacecraftCargoUsageException("User with ID " + spacecraftId + " not found");
         }
     }
 
