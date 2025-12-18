@@ -57,6 +57,21 @@ public class GlobalExceptionHandler {
                 ));
     }
 
+
+    @ExceptionHandler(SpacecraftCargoUsageException.class)
+    public ResponseEntity<ErrorResponse> handleSpacecraftCargoUsageException(SpacecraftCargoUsageException ex) {
+        log.warn("Cargo service unavailable: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(new ErrorResponse(
+                        LocalDateTime.now(),
+                        HttpStatus.SERVICE_UNAVAILABLE.value(),
+                        "Cargo service unavailable!",
+                        ex.getMessage()
+                ));
+    }
+
+
+
     @ExceptionHandler(DataNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleDataNotFoundException(DataNotFoundException ex) {
         log.warn("Data not found: {}", ex.getMessage());

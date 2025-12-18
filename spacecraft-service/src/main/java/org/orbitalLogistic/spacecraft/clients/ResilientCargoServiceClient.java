@@ -1,32 +1,49 @@
 package org.orbitalLogistic.spacecraft.clients;
 
+import java.util.function.Supplier;
+
 import org.orbitalLogistic.spacecraft.exceptions.SpacecraftCargoUsageException;
 import org.orbitalLogistic.spacecraft.exceptions.SpacecraftNotFoundException;
 
 import org.springframework.stereotype.Component;
 
 import feign.FeignException;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class ResilientCargoServiceClient {
     private final CargoServiceClient cargoServiceApi;
+    private final CircuitBreakerRegistry registry;
 
-    @CircuitBreaker(name = "cargoService", fallbackMethod = "getSpacecraftCargoUsageFallback")
     public SpacecraftCargoUsageDTO getSpacecraftCargoUsage(Long spacecraftId) {
+        CircuitBreaker cb = registry.circuitBreaker("cargoService");
+    
+        Supplier<SpacecraftCargoUsageDTO> supplier = CircuitBreaker.decorateSupplier(
+            cb,
+            () -> cargoServiceApi.getSpacecraftCargoUsage(spacecraftId)
+        );
+        
         try {
-            return cargoServiceApi.getSpacecraftCargoUsage(spacecraftId);
+            return supplier.get();
+        } catch (CallNotPermittedException e) {
+            return getSpacecraftCargoUsageFallback(spacecraftId, e);
         } catch (FeignException.NotFound e) {
-            throw new SpacecraftNotFoundException("Spacecraft with ID " + spacecraftId + " not found");
+            throw new SpacecraftCargoUsageException("User with ID " + spacecraftId + " not found");
         }
     }
 
-    public SpacecraftCargoUsageDTO getSpacecraftCargoUsageFallback(Long spacecraftId, Throwable t) {
-        log.error("FALLBACK getCargoById! status: {}, error: {}", spacecraftId, t.getClass().getSimpleName());
+    public SpacecraftCargoUsageDTO getSpacecraftCargoUsageFallback(Long spacecraftId, Throwable e) {
+        log.error("FALLBACK getCargoById! status: {}, error: {}", spacecraftId, e.getClass().getSimpleName());
         throw new SpacecraftCargoUsageException("Cargo Service unavailable!");
     }
+
 }

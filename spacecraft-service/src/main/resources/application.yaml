@@ -11,18 +11,5 @@ spring:
       fail-fast: false
       allow-override: true
 
-resilience4j:
-  circuitbreaker:
-    enabled: true
-    instances:
-      cargoService:
-        registerHealthIndicator: true
-        slidingWindowType: COUNT_BASED
-        slidingWindowSize: 10
-        minimumNumberOfCalls: 5
-        waitDurationInOpenState: 10s
-        permittedNumberOfCallsInHalfOpenState: 3
-        failureRateThreshold: 50
-        slowCallRateThreshold: 100
-        slowCallDurationThreshold: 2s
+
 
