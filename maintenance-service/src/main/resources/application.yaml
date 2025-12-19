@@ -1,5 +1,5 @@
 server:
-  port: 0  # Динамический порт для Eureka
+  port: 0
 
 spring:
   application:
@@ -13,6 +13,3 @@ spring:
       retry:
         max-attempts: 20
         initial-interval: 3000
-  
-
-
