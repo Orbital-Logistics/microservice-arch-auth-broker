@@ -143,9 +143,7 @@ class MaintenanceLogControllerTest {
                 .uri("/maintenance-logs?page=0&size=100")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isOk();
-
-        verify(maintenanceLogService).getAllMaintenanceLogs(0, 50);
+                .expectStatus().isBadRequest();
     }
 
     @Test

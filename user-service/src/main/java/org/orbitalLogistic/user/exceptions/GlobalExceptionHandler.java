@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.support.WebExchangeBindException;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 
 import jakarta.validation.ConstraintViolationException;
@@ -169,6 +170,17 @@ public class GlobalExceptionHandler {
                 ex.getMessage()
         );
         return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse));
+    }
+
+    @ExceptionHandler(ServerWebInputException.class)
+    public Mono<ResponseEntity<Map<String, String>>> handleServerWebInputException(
+            ServerWebInputException ex) {
+        return Mono.just(ResponseEntity
+                .badRequest()
+                .body(Map.of(
+                        "error", "Invalid request body",
+                        "message", "Malformed JSON or invalid request format"
+                )));
     }
 
     @ExceptionHandler(Exception.class)
