@@ -38,6 +38,8 @@ public class ResilientCargoServiceClient {
             return getSpacecraftCargoUsageFallback(spacecraftId, e);
         } catch (FeignException.NotFound e) {
             throw new SpacecraftCargoUsageException("User with ID " + spacecraftId + " not found");
+        } catch (FeignException e) {
+            throw new SpacecraftCargoUsageException("Cargo Service unavailable!");
         }
     }
 

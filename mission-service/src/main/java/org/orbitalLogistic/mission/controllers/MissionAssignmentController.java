@@ -10,7 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/mission-assignments")
@@ -18,6 +22,28 @@ import java.util.List;
 public class MissionAssignmentController {
 
     private final MissionAssignmentService missionAssignmentService;
+    private final CircuitBreakerRegistry registry;
+
+    @GetMapping("/get-cb-config")
+    public Map<String, Object> getConfigCB(@RequestParam String name){
+        CircuitBreaker cb = registry.circuitBreaker(name);
+        if (cb == null) {
+            return Map.of("error", "CircuitBreaker not found: " + name);
+        }   
+        
+        return Map.of(
+            "name", name,
+            "state", cb.getState(),
+            "config", Map.of(
+                "failureRateThreshold", cb.getCircuitBreakerConfig().getFailureRateThreshold(),
+                "slidingWindowSize", cb.getCircuitBreakerConfig().getSlidingWindowSize(),
+                "minimumNumberOfCalls", cb.getCircuitBreakerConfig().getMinimumNumberOfCalls(),
+                "waitDurationInOpenState", cb.getCircuitBreakerConfig().getWaitIntervalFunctionInOpenState(),
+                "permittedNumberOfCallsInHalfOpenState", cb.getCircuitBreakerConfig().getPermittedNumberOfCallsInHalfOpenState(),
+                "slidingWindowType", cb.getCircuitBreakerConfig().getSlidingWindowType()
+            )
+        );
+    }
 
     @GetMapping
     public ResponseEntity<PageResponseDTO<MissionAssignmentResponseDTO>> getAllAssignments(

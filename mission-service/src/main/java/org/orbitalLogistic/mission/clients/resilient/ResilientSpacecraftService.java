@@ -23,16 +23,14 @@ public class ResilientSpacecraftService {
             return spacecraftServiceApi.getSpacecraftById(id);
         } catch (FeignException.NotFound e) {
             throw new SpacecraftServiceNotFound("Spacecraft with ID " + id + " not found");
+        } catch (FeignException e) {
+            throw new SpacecraftServiceException("Spacecraft Service unavailable!");
         }
     }
 
     public SpacecraftDTO fallbackGetSpacecraftById(Long id, Throwable t) {
         log.error("Fallback triggered for spacecraft ID: {}. Error: {}", id, t.getMessage(), t);
-        
-        if (!(t instanceof SpacecraftServiceException && t.getMessage().contains("not found"))) {
-            throw new SpacecraftServiceException("Spacecraft Service unavailable!");
-        }
-        throw (SpacecraftServiceException) t;
+        throw new SpacecraftServiceException("Spacecraft Service unavailable!");
     }
     
     @CircuitBreaker(name = "spacecraftService", fallbackMethod = "spacecraftExistsFallback")
@@ -41,17 +39,13 @@ public class ResilientSpacecraftService {
             return spacecraftServiceApi.spacecraftExists(id);
         } catch (FeignException.NotFound e) {
             throw new SpacecraftServiceNotFound("Spacecraft with ID " + id + " not found");
+        } catch (FeignException e) {
+            throw new SpacecraftServiceException("Spacecraft Service unavailable!");
         }
     }
     
     public Boolean spacecraftExistsFallback(Long id, Throwable t) {
         log.error("Fallback for spacecraftExists ID: {}. Error: {}", id, t.getMessage());
-        
-        if (t instanceof java.net.NoRouteToHostException || 
-            t instanceof java.net.UnknownHostException) {
-            return false;
-        }
-
         throw new SpacecraftServiceException("Spacecraft Service unavailable!");
     }
 }

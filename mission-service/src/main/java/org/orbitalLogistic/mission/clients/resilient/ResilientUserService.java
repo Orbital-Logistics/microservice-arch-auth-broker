@@ -35,10 +35,7 @@ public class ResilientUserService {
 
     public UserDTO getUserbyIdFallback(Long id, Throwable t) {
         log.error("FALLBACK getUserById! userId: {}, error: {}", id, t.getClass().getSimpleName());
-        if (!(t instanceof UserServiceException && t.getMessage().contains("not found"))) {
-            throw new UserServiceException("User service unavailable", t);
-        }
-        throw (UserServiceException) t;
+        throw new UserServiceException("User service unavailable");
     }
 
     @CircuitBreaker(name = "userService", fallbackMethod = "userExistsFallback")
@@ -58,9 +55,6 @@ public class ResilientUserService {
 
     public Boolean userExistsFallback(Long id, Throwable t) {
         log.error("FALLBACK userExists! userId: {}, error: {}", id, t.getClass().getSimpleName());
-        if (!(t instanceof UserServiceException && t.getMessage().contains("not found"))) {
-            throw new UserServiceException("User service unavailable", t);
-        }
-        throw (UserServiceException) t;
+        throw new UserServiceException("User service unavailable");
     }
 }

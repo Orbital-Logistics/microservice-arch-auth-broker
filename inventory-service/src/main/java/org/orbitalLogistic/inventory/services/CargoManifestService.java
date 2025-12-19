@@ -137,7 +137,7 @@ public class CargoManifestService {
             }
         } catch (Exception e) {
             log.error("Failed to validate {}: {}", entityName, e.getMessage());
-            throw new InvalidOperationException("Unable to validate " + entityName.toLowerCase() + ". " + serviceName + " may be unavailable.");
+            throw new InvalidOperationException("Unable to validate " + entityName.toLowerCase());
         }
     }
 

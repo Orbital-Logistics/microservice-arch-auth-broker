@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 import org.orbitalLogistic.inventory.clients.SpacecraftDTO;
 import org.orbitalLogistic.inventory.clients.UserDTO;
 import org.orbitalLogistic.inventory.clients.UserServiceClient;
+import org.orbitalLogistic.inventory.exceptions.SpacecraftServiceException;
 import org.orbitalLogistic.inventory.exceptions.UserServiceException;
 import org.orbitalLogistic.inventory.exceptions.UserServiceNotFound;
 import org.springframework.stereotype.Component;
@@ -40,7 +41,7 @@ public class ResilientUserService {
         } catch (FeignException.NotFound e) {
             throw new UserServiceNotFound("User with ID " + id + " not found", e);
         } catch (FeignException e) {
-            throw new UserServiceException("Unable to send request User Service");
+            throw new UserServiceException("User Service unavailable!");
         }
         // try {
         //     return userServiceApi.getUserById(id);
@@ -69,8 +70,8 @@ public class ResilientUserService {
             return userExistsFallback(id, e);
         } catch (FeignException.NotFound e) {
             throw new UserServiceNotFound("User with ID " + id + " not found", e);
-        } catch (FeignException e) {
-            throw new UserServiceException("Unable to send request User Service");
+        } catch (FeignException.ServiceUnavailable e) {
+            throw new UserServiceException("User Service unavailable!");
         }
         // try {
         //     return userServiceApi.userExists(id);

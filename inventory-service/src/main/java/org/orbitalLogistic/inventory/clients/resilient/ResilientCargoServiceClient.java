@@ -7,6 +7,7 @@ import org.orbitalLogistic.inventory.clients.CargoServiceClient;
 import org.orbitalLogistic.inventory.clients.StorageUnitDTO;
 import org.orbitalLogistic.inventory.exceptions.CargoServiceException;
 import org.orbitalLogistic.inventory.exceptions.SpacecraftServiceException;
+import org.orbitalLogistic.inventory.exceptions.UserServiceException;
 import org.springframework.stereotype.Component;
 
 import feign.FeignException;
@@ -38,6 +39,8 @@ public class ResilientCargoServiceClient {
             return getCargoByIdFallback(id, e);
         } catch (FeignException.NotFound e) {
             throw new CargoServiceException("User with ID " + id + " not found", e);
+        } catch (FeignException.ServiceUnavailable e) {
+            throw new UserServiceException("Cargo Service unavailable!");
         }
         // try {
         //     return cargoServiceApi.getCargoById(id);
@@ -66,6 +69,8 @@ public class ResilientCargoServiceClient {
             return cargoExistsFallback(id, e);
         } catch (FeignException.NotFound e) {
             throw new CargoServiceException("User with ID " + id + " not found", e);
+        } catch (FeignException.ServiceUnavailable e) {
+            throw new UserServiceException("Cargo Service unavailable!");
         }
         // try {
         //     return cargoServiceApi.cargoExists(id);
@@ -94,6 +99,8 @@ public class ResilientCargoServiceClient {
             return getStorageUnitByIdFallback(id, e);
         } catch (FeignException.NotFound e) {
             throw new CargoServiceException("User with ID " + id + " not found", e);
+        } catch (FeignException.ServiceUnavailable e) {
+            throw new UserServiceException("Spacecraft Service unavailable!");
         }
         // try {
         //     return cargoServiceApi.getStorageUnitById(id);
@@ -122,6 +129,8 @@ public class ResilientCargoServiceClient {
             return storageUnitExistsFallback(id, e);
         } catch (FeignException.NotFound e) {
             throw new CargoServiceException("User with ID " + id + " not found", e);
+        }catch (FeignException e) {
+            throw new UserServiceException("Spacecraft Service unavailable!");
         }
         // try {
         //     return cargoServiceApi.storageUnitExists(id);

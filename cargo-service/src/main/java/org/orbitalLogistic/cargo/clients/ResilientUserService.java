@@ -32,6 +32,8 @@ public class ResilientUserService {
             return getUserByIdFallback(id, e);
         } catch (FeignException.NotFound e) {
             throw new UserServiceException("User with ID " + id + " not found", e);
+        } catch (FeignException e) {
+            throw new UserServiceException("User Service unavailable!");
         }
     }
 
@@ -69,6 +71,8 @@ public class ResilientUserService {
             return userExistsFallback(id, e);
         } catch (FeignException.NotFound e) {
             throw new UserServiceException("User with ID " + id + " not found", e);
+        } catch (FeignException e) {
+            throw new UserServiceException("User Service unavailable!");
         }
     }
 

@@ -23,12 +23,12 @@ spring:
 #         registerHealthIndicator: true
 #         slidingWindowType: COUNT_BASED
 #         slidingWindowSize: 10
-#         minimumNumberOfCalls: 5
-#         waitDurationInOpenState: 10s
+#         minimumNumberOfCalls: 1
+#         waitDurationInOpenState: 3s
 #         permittedNumberOfCallsInHalfOpenState: 3
-#         failureRateThreshold: 50
+#         failureRateThreshold: 10
 #         slowCallRateThreshold: 100
-#         slowCallDurationThreshold: 2s
+#         slowCallDurationThreshold: 1s
 #       spacecraftService:
 #         registerHealthIndicator: true
 #         slidingWindowType: COUNT_BASED
