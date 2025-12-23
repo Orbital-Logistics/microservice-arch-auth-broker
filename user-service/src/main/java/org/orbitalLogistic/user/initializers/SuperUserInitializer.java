@@ -51,7 +51,7 @@ public class SuperUserInitializer implements CommandLineRunner {
                 .roles(Set.of(rootRole.get()))
                 .build();
 
-            userService.create(admin);
+            userService.createOrUpdateUser(admin);
         }
     }
 }

@@ -5,9 +5,11 @@ import org.orbitalLogistic.user.exceptions.auth.*;
 import org.orbitalLogistic.user.exceptions.common.BadRequestException;
 import org.orbitalLogistic.user.exceptions.common.DataNotFoundException;
 import org.orbitalLogistic.user.exceptions.common.InvalidOperationException;
-import org.orbitalLogistic.user.exceptions.common.UnknownUsernameException;
+import org.orbitalLogistic.user.exceptions.auth.UnknownUsernameException;
+import org.orbitalLogistic.user.exceptions.common.NotFoundException;
 import org.orbitalLogistic.user.exceptions.roles.RoleAlreadyExistsException;
 import org.orbitalLogistic.user.exceptions.roles.RoleDoesNotExistException;
+import org.orbitalLogistic.user.exceptions.roles.UnknownRoleException;
 import org.orbitalLogistic.user.exceptions.update.EmptyUpdateRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +21,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.support.WebExchangeBindException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ServerWebInputException;
-import reactor.core.publisher.Mono;
 
 import jakarta.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
@@ -189,6 +191,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleWrongCredentialsException(WrongCredentialsException ex) {
         log.warn("Wrong username or password: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException ex) {
+        log.warn("Not found: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
+        log.warn("Argument mismatch: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
     }
 
     @ExceptionHandler(DataNotFoundException.class)

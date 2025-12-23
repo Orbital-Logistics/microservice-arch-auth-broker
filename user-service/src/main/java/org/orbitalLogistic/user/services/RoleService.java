@@ -2,7 +2,7 @@ package org.orbitalLogistic.user.services;
 
 import lombok.RequiredArgsConstructor;
 import org.orbitalLogistic.user.entities.Role;
-import org.orbitalLogistic.user.exceptions.auth.UnknownRoleException;
+import org.orbitalLogistic.user.exceptions.roles.UnknownRoleException;
 import org.orbitalLogistic.user.exceptions.roles.RoleAlreadyExistsException;
 import org.orbitalLogistic.user.exceptions.roles.RoleDoesNotExistException;
 import org.orbitalLogistic.user.repositories.RoleRepository;
@@ -17,9 +17,20 @@ public class RoleService {
 
     private final RoleRepository roleRepository;
 
-    @Transactional(rollbackFor = Exception.class)
     public Optional<Role> getRoleByName(String name) {
         return roleRepository.findByName(name);
+    }
+
+    public Set<String> getAllRolesStrings() {
+        Set<String> roles = new HashSet<>(Set.of());
+
+        List<Role> rolesEntities = roleRepository.findAll();
+
+        for (var role : rolesEntities) {
+            roles.add(role.getName());
+        }
+
+        return roles;
     }
 
     @Transactional(rollbackFor = Exception.class)

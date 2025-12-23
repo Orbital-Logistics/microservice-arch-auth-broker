@@ -1,14 +1,14 @@
 package org.orbitalLogistic.user.controllers;
 
 import jakarta.validation.Valid;
-import lombok.Generated;
 import lombok.RequiredArgsConstructor;
 
+import org.orbitalLogistic.user.dto.response.RolesResponseDTO;
 import org.orbitalLogistic.user.dto.response.UserResponseDTO;
 import org.orbitalLogistic.user.entities.Role;
 import org.orbitalLogistic.user.entities.User;
 import org.orbitalLogistic.user.exceptions.common.BadRequestException;
-import org.orbitalLogistic.user.exceptions.update.EmptyUpdateRequestException;
+import org.orbitalLogistic.user.exceptions.common.NotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +16,7 @@ import org.orbitalLogistic.user.dto.request.UpdateUserRequestDTO;
 import org.orbitalLogistic.user.services.UserService;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -29,14 +30,13 @@ public class UserController {
     @PutMapping("/update")
     @PreAuthorize("hasRole('ADMIN') or #request.username == authentication.name")
     public ResponseEntity<UserResponseDTO> updateUser(@Valid @RequestBody UpdateUserRequestDTO request) {
-
         if (request.getUsername() == null) {
             throw new BadRequestException("Username is required");
         }
 
         User user = userService.updateUser(request.getUsername(), request.getNewUsername(), request.getEmail());
 
-        UserResponseDTO userResponseDTO = UserResponseDTO.builder()
+        UserResponseDTO responseDTO = UserResponseDTO.builder()
                 .id(user.getId())
                 .username(user.getUsername())
                 .email(user.getEmail())
@@ -48,69 +48,100 @@ public class UserController {
 
         return ResponseEntity
                 .ok()
-                .body(userResponseDTO);
+                .body(responseDTO);
     }
 
-    // MARK implement
-//    @GetMapping("/username/{username}")
-//    public ResponseEntity<> getUserByUsername(String username) {
-//
-//    }
-//    @GetMapping("id/{id}")
-//    public ResponseEntity<> getUserById(Long id) {
-//
-//    }
-//    @GetMapping("email/{email}")
-//    public ResponseEntity<> getUserByEmail(String email) {
-//
-//    }
-//    @GetMapping("/{id}/roles")
-//    public ResponseEntity<> getUserRoles(Long id) {
-//
-//    }
-//    @PostMapping("create")
-//    public ResponseEntity<> getUserRoles(Long id) {
-//
-//    }
+    @GetMapping("/email/{email}")
+    public ResponseEntity<UserResponseDTO> getUserByEmail(@PathVariable String email) {
+        Optional<User> user = userService.findUserByEmail(email);
 
-//    @GetMapping("/{id}")
-//    public Mono<ResponseEntity<UserResponseDTO>> getUserById(@PathVariable Long id) {
-//        return userService.findUserById(id)
-//                .map(response ->
-//                        ResponseEntity
-//                                .ok()
-//                                .body(response));
-//    }
+        if (user.isEmpty()) {
+            throw new NotFoundException("");
+        }
 
-//    @GetMapping("/{id}/username")
-//    public Mono<ResponseEntity<String>> getUsernameById(@PathVariable Long id) {
-//        return userService.findUserById(id)
-//                .map(response ->
-//                        ResponseEntity
-//                                .ok()
-//                                .body(response.username()));
-//    }
+        UserResponseDTO responseDTO = UserResponseDTO.builder()
+                .id(user.get().getId())
+                .username(user.get().getUsername())
+                .email(user.get().getEmail())
+                .roles(user.get().getRoles()
+                        .stream()
+                        .map(Role::getName)
+                        .collect(Collectors.toSet()))
+                .build();
 
-//    @PutMapping("/{id}")
-//    public Mono<ResponseEntity<UserResponseDTO>> updateUser(
-//            @PathVariable Long id,
-//            @Valid @RequestBody UpdateUserRequestDTO request
-//    ) {
-//        return userService.updateUser(id, request)
-//                .map(response ->
-//                        ResponseEntity
-//                                .ok()
-//                                .body(response));
-//    }
+        return ResponseEntity
+                .ok()
+                .body(responseDTO);
+    }
 
-//    @DeleteMapping("/{id}")
-//    public Mono<ResponseEntity<Void>> deleteUser(@PathVariable Long id) {
-//        return userService.deleteUser(id).thenReturn(ResponseEntity.noContent().build());
-//    }
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long id) {
+        Optional<User> user = userService.findUserById(id);
 
-//    @GetMapping("/{id}/exists")
-//    public Mono<ResponseEntity<Boolean>> userExists(@PathVariable Long id) {
-//        return userService.userExists(id)
-//                .map(ResponseEntity::ok);
-//    }
+        if (user.isEmpty()) {
+            throw new NotFoundException("");
+        }
+
+        UserResponseDTO responseDTO = UserResponseDTO.builder()
+                .id(user.get().getId())
+                .username(user.get().getUsername())
+                .email(user.get().getEmail())
+                .roles(user.get().getRoles()
+                        .stream()
+                        .map(Role::getName)
+                        .collect(Collectors.toSet()))
+                .build();
+
+        return ResponseEntity
+                .ok()
+                .body(responseDTO);
+    }
+
+    @GetMapping("/{id}/username")
+    public ResponseEntity<String> getUsernameById(@PathVariable Long id) {
+        Optional<User> user = userService.findUserById(id);
+
+        if (user.isEmpty()) {
+            throw new NotFoundException("");
+        }
+
+        return ResponseEntity
+                .ok()
+                .body(user.get().getUsername());
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+
+        return ResponseEntity
+                .noContent()
+                .build();
+    }
+
+    @GetMapping("/{id}/exists")
+    public ResponseEntity<Boolean> userExists(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.userExists(id));
+    }
+
+    @GetMapping("/{id}/roles")
+    public ResponseEntity<RolesResponseDTO> getUserRoles(@PathVariable Long id) {
+        Optional<User> user = userService.findUserById(id);
+
+        if (user.isEmpty()) {
+            throw new NotFoundException("");
+        }
+
+        RolesResponseDTO responseDTO = RolesResponseDTO.builder()
+                .roles(user.get().getRoles()
+                        .stream()
+                        .map(Role::getName)
+                        .collect(Collectors.toSet()))
+                .build();
+
+        return ResponseEntity
+                .ok()
+                .body(responseDTO);
+    }
 }
