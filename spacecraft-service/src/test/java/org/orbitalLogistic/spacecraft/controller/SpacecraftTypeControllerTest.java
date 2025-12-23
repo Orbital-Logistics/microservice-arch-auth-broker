@@ -9,8 +9,10 @@ import org.orbitalLogistic.spacecraft.dto.request.SpacecraftTypeRequestDTO;
 import org.orbitalLogistic.spacecraft.dto.response.SpacecraftTypeResponseDTO;
 import org.orbitalLogistic.spacecraft.entities.enums.SpacecraftClassification;
 import org.orbitalLogistic.spacecraft.exceptions.SpacecraftTypeNotFoundException;
+import org.orbitalLogistic.spacecraft.services.JwtService;
 import org.orbitalLogistic.spacecraft.services.SpacecraftTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
@@ -25,6 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(SpacecraftTypeController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class SpacecraftTypeControllerTest {
 
     @Autowired
@@ -35,6 +38,9 @@ class SpacecraftTypeControllerTest {
 
     @MockitoBean
     private SpacecraftTypeService spacecraftTypeService;
+
+    @MockitoBean
+    private JwtService jwtService;
 
     private SpacecraftTypeResponseDTO spacecraftTypeResponse;
     private SpacecraftTypeRequestDTO spacecraftTypeRequest;

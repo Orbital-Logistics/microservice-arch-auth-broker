@@ -12,8 +12,10 @@ import org.orbitalLogistic.mission.entities.enums.MissionPriority;
 import org.orbitalLogistic.mission.entities.enums.MissionStatus;
 import org.orbitalLogistic.mission.entities.enums.MissionType;
 import org.orbitalLogistic.mission.exceptions.MissionNotFoundException;
+import org.orbitalLogistic.mission.services.JwtService;
 import org.orbitalLogistic.mission.services.MissionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -31,6 +33,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(MissionController.class)
+@AutoConfigureMockMvc(addFilters = false)
 @TestPropertySource(properties = {
         "spring.cloud.config.enabled=false"
 })
@@ -44,6 +47,9 @@ class MissionControllerTest {
 
     @MockitoBean
     private MissionService missionService;
+
+    @MockitoBean
+    private JwtService jwtService;
 
     private MissionResponseDTO missionResponse;
     private MissionRequestDTO missionRequest;

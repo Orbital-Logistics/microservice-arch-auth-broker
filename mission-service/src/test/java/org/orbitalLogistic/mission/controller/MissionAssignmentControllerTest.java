@@ -10,8 +10,10 @@ import org.orbitalLogistic.mission.dto.request.MissionAssignmentRequestDTO;
 import org.orbitalLogistic.mission.dto.response.MissionAssignmentResponseDTO;
 import org.orbitalLogistic.mission.entities.enums.AssignmentRole;
 import org.orbitalLogistic.mission.exceptions.MissionAssignmentNotFoundException;
+import org.orbitalLogistic.mission.services.JwtService;
 import org.orbitalLogistic.mission.services.MissionAssignmentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
@@ -30,6 +32,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(MissionAssignmentController.class)
+@AutoConfigureMockMvc(addFilters = false)
 @TestPropertySource(properties = {
         "spring.cloud.config.enabled=false"
 })
@@ -46,6 +49,9 @@ class MissionAssignmentControllerTest {
 
     @MockitoBean
     private CircuitBreakerRegistry circuitBreakerRegistry;
+
+    @MockitoBean
+    private JwtService jwtService;
 
     private MissionAssignmentResponseDTO assignmentResponse;
     private MissionAssignmentRequestDTO assignmentRequest;
