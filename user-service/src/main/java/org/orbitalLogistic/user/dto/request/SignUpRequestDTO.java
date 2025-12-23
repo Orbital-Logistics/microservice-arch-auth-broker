@@ -28,5 +28,5 @@ public class SignUpRequestDTO {
         private String password;
 
         @NotEmpty(message = "User roles cannot be empty")
-        private Set<@NotBlank String> roles;
+        private Set<String> roles;
 }

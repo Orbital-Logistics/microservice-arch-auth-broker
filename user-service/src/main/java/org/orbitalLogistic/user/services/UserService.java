@@ -6,12 +6,15 @@ import lombok.RequiredArgsConstructor;
 
 import org.orbitalLogistic.user.entities.Role;
 import org.orbitalLogistic.user.entities.User;
+import org.orbitalLogistic.user.exceptions.auth.ForbiddenException;
 import org.orbitalLogistic.user.exceptions.auth.UsernameAlreadyExistsException;
 import org.orbitalLogistic.user.exceptions.common.BadRequestException;
 import org.orbitalLogistic.user.exceptions.common.UnknownUsernameException;
 import org.orbitalLogistic.user.repositories.UserRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +25,6 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final RoleService roleService;
 
@@ -35,7 +37,7 @@ public class UserService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public User updateUser(String username, @Nullable String password, @Nullable String email, @Nullable Set<String> roles) {
+    public User updateUser(String username, @Nullable String newUsername, @Nullable String email) {
 
         Optional<User> updatedUser = userRepository.findByUsername(username);
 
@@ -43,11 +45,11 @@ public class UserService {
             throw new UnknownUsernameException(username);
         }
 
-        if (password != null) {
-            if (!password.isEmpty()) {
-                updatedUser.get().setPassword(passwordEncoder.encode(password));
+        if (newUsername != null) {
+            if (!newUsername.isEmpty()) {
+                updatedUser.get().setUsername(newUsername);
             } else {
-                throw new BadRequestException("Password cannot be empty");
+                throw new BadRequestException("New username cannot be empty");
             }
         }
 
@@ -59,35 +61,15 @@ public class UserService {
             }
         }
 
-        if (roles != null) {
-            if (!roles.isEmpty()) {
-                Set<Role> validatedRoles = roleService.validateRoles(roles);
-                updatedUser.get().getRoles().addAll(validatedRoles);
-            } else {
-                throw new BadRequestException("Roles cannot be empty");
-            }
-        }
-
         return userRepository.save(updatedUser.get());
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public User removeRoles(String username, Set<String> roles) {
+    public void createOrUpdateUser(User user) {
+        userRepository.save(user);
+    }
 
-        Optional<User> updatedUser = userRepository.findByUsername(username);
-
-        if (updatedUser.isEmpty()) {
-            throw new UnknownUsernameException(username);
-        }
-
-        if (!roles.isEmpty()) {
-            Set<Role> validatedRoles = roleService.validateRoles(roles);
-            updatedUser.get().getRoles().removeAll(validatedRoles);
-        } else {
-            throw new BadRequestException("Roles cannot be empty");
-        }
-
-        return userRepository.save(updatedUser.get());
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 
 //    protected UserResponseDTO registerUser(SignUpRequestDTO request) {
@@ -141,13 +123,6 @@ public class UserService {
 //        user = userRepository.save(user);
 //        return toResponseDTO(user);
 //    }
-
-    protected void deleteUser(Long id) {
-//        if (!userRepository.existsById(id)) {
-//            throw new UserNotFoundException("User not found");
-//        }
-//        userRepository.deleteById(id);
-    }
 
     public User getEntityByIdOrNull(Long id) {
         return userRepository.findById(id).orElse(null);

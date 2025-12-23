@@ -67,4 +67,24 @@ public class RoleService {
         }
         return validatedRoles;
     }
+
+    public Set<String> rolesToString(Set<Role> roles) {
+        List<Role> activeRoles = roleRepository.findAll();
+        Set<String> validatedRoles = new HashSet<>();
+
+        for (Role role : roles) {
+            boolean valid = false;
+            for (Role activeRole : activeRoles) {
+                if (activeRole.getName().equals(role.getName())) {
+                    validatedRoles.add(activeRole.getName());
+                    valid = true;
+                    break;
+                }
+            }
+            if (!valid) {
+                throw new UnknownRoleException(role.getName());
+            }
+        }
+        return validatedRoles;
+    }
 }

@@ -1,6 +1,7 @@
 package org.orbitalLogistic.user.controllers;
 
 import jakarta.validation.Valid;
+import lombok.Generated;
 import lombok.RequiredArgsConstructor;
 
 import org.orbitalLogistic.user.dto.response.UserResponseDTO;
@@ -25,19 +26,15 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/update")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/update")
+    @PreAuthorize("hasRole('ADMIN') or #request.username == authentication.name")
     public ResponseEntity<UserResponseDTO> updateUser(@Valid @RequestBody UpdateUserRequestDTO request) {
 
         if (request.getUsername() == null) {
             throw new BadRequestException("Username is required");
         }
 
-        if (request.getPassword() == null && request.getEmail() == null && request.getRoles() == null) {
-            throw new EmptyUpdateRequestException("Update request should contains new user parameters");
-        }
-
-        User user = userService.updateUser(request.getUsername(), request.getPassword(), request.getEmail(), request.getRoles());
+        User user = userService.updateUser(request.getUsername(), request.getNewUsername(), request.getEmail());
 
         UserResponseDTO userResponseDTO = UserResponseDTO.builder()
                 .id(user.getId())
@@ -54,46 +51,26 @@ public class UserController {
                 .body(userResponseDTO);
     }
 
-    @PostMapping("/remove-roles")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserResponseDTO> removeRoles(@Valid @RequestBody UpdateUserRequestDTO request) {
-        if (request.getRoles() == null) {
-            throw new EmptyUpdateRequestException("Request should contains roles");
-        }
-
-        User user = userService.removeRoles(request.getUsername(), request.getRoles());
-
-        UserResponseDTO userResponseDTO = UserResponseDTO.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .roles(user.getRoles()
-                        .stream()
-                        .map(Role::getName)
-                        .collect(Collectors.toSet()))
-                .build();
-
-        return ResponseEntity
-                .ok()
-                .body(userResponseDTO);
-    }
-
-//    @PostMapping("/register")
-//    public Mono<ResponseEntity<UserResponseDTO>> registerUser(@Valid @RequestBody SignUpRequestDTO request) {
-//        return userService.registerUser(request)
-//                .map(response ->
-//                        ResponseEntity
-//                                .status(HttpStatus.CREATED)
-//                                .body(response));
+    // MARK implement
+//    @GetMapping("/username/{username}")
+//    public ResponseEntity<> getUserByUsername(String username) {
+//
 //    }
-
-//    @GetMapping("/email/{email}")
-//    public Mono<ResponseEntity<UserResponseDTO>> getUserByEmail(@PathVariable String email) {
-//        return userService.findUserByEmail(email)
-//                .map(response ->
-//                        ResponseEntity
-//                                .ok()
-//                                .body(response));
+//    @GetMapping("id/{id}")
+//    public ResponseEntity<> getUserById(Long id) {
+//
+//    }
+//    @GetMapping("email/{email}")
+//    public ResponseEntity<> getUserByEmail(String email) {
+//
+//    }
+//    @GetMapping("/{id}/roles")
+//    public ResponseEntity<> getUserRoles(Long id) {
+//
+//    }
+//    @PostMapping("create")
+//    public ResponseEntity<> getUserRoles(Long id) {
+//
 //    }
 
 //    @GetMapping("/{id}")

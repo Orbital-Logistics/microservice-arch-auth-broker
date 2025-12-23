@@ -8,10 +8,7 @@ import org.orbitalLogistic.user.services.RoleService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,18 +21,19 @@ public class RoleController {
     @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponseDTO> createRole(@Valid @RequestBody RoleRequestDTO request) {
-
         roleService.createRole(request.getRole());
-
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/remove")
+    @DeleteMapping("/remove")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponseDTO> removeRole(@Valid @RequestBody RoleRequestDTO request) {
-
         roleService.removeRole(request.getRole());
-
         return ResponseEntity.ok().build();
     }
+
+    //    @GetMapping("get/roles")
+    //    public ResponseEntity<> getAllRoles(Long id) {
+    //
+    //    }
 }

@@ -17,13 +17,12 @@ public class UpdateUserRequestDTO {
     @Pattern(regexp = "^[a-zA-Z0-9_.-]+$", message = "Username can only contain letters, numbers, dots, underscores and hyphens")
     private String username;
 
-    @Size(min = 8, max = 15, message = "Password must be from 8 to 15 characters")
-    private String password;
-
     @Email(message = "Email must be valid")
     @Size(max = 30, message = "Email must not exceed 30 characters")
     @Pattern(regexp = "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$", message = "Invalid email format")
     private String email;
 
-    private Set<String> roles;
+    @Size(min = 2, max = 64, message = "New username must be between 2 and 64 characters")
+    @Pattern(regexp = "^[a-zA-Z0-9_.-]+$", message = "new username can only contain letters, numbers, dots, underscores and hyphens")
+    private String newUsername;
 }
