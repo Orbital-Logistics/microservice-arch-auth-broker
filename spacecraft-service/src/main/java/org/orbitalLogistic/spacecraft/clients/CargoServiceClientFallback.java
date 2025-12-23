@@ -1,6 +1,7 @@
 package org.orbitalLogistic.spacecraft.clients;
 
 import lombok.extern.slf4j.Slf4j;
+import org.orbitalLogistic.spacecraft.dto.common.SpacecraftCargoUsageDTO;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;

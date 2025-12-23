@@ -7,8 +7,8 @@ import org.orbitalLogistic.spacecraft.dto.response.SpacecraftTypeResponseDTO;
 import org.orbitalLogistic.spacecraft.services.SpacecraftTypeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -20,24 +20,25 @@ public class SpacecraftTypeController {
     private final SpacecraftTypeService spacecraftTypeService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'MISSION_COMMANDER')")
-    public ResponseEntity<List<SpacecraftTypeResponseDTO>> getAllSpacecraftTypes() {
-        List<SpacecraftTypeResponseDTO> response = spacecraftTypeService.getAllSpacecraftTypes();
-        return ResponseEntity.ok(response);
+    public Mono<ResponseEntity<List<SpacecraftTypeResponseDTO>>> getAllSpacecraftTypes() {
+        return spacecraftTypeService.getAllSpacecraftTypes()
+                .map(ResponseEntity::ok);
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MISSION_COMMANDER')")
-    public ResponseEntity<SpacecraftTypeResponseDTO> getSpacecraftTypeById(@PathVariable Long id) {
-        SpacecraftTypeResponseDTO response = spacecraftTypeService.getSpacecraftTypeById(id);
-        return ResponseEntity.ok(response);
+    public Mono<ResponseEntity<SpacecraftTypeResponseDTO>> getSpacecraftTypeById(@PathVariable Long id) {
+        return spacecraftTypeService.getSpacecraftTypeById(id)
+                .map(ResponseEntity::ok);
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'MISSION_COMMANDER')")
-    public ResponseEntity<SpacecraftTypeResponseDTO> createSpacecraftType(@Valid @RequestBody SpacecraftTypeRequestDTO request) {
-        SpacecraftTypeResponseDTO response = spacecraftTypeService.createSpacecraftType(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public Mono<ResponseEntity<SpacecraftTypeResponseDTO>> createSpacecraftType(@Valid @RequestBody SpacecraftTypeRequestDTO request) {
+        return spacecraftTypeService.createSpacecraftType(request)
+                .map(response ->
+                        ResponseEntity
+                                .status(HttpStatus.CREATED)
+                                .body(response)
+                );
     }
 }
 

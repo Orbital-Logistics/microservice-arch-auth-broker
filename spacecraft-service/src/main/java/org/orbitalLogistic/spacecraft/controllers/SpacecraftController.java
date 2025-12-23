@@ -9,8 +9,8 @@ import org.orbitalLogistic.spacecraft.entities.enums.SpacecraftStatus;
 import org.orbitalLogistic.spacecraft.services.SpacecraftService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -22,8 +22,7 @@ public class SpacecraftController {
     private final SpacecraftService spacecraftService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'MISSION_COMMANDER')")
-    public ResponseEntity<PageResponseDTO<SpacecraftResponseDTO>> getAllSpacecrafts(
+    public Mono<ResponseEntity<PageResponseDTO<SpacecraftResponseDTO>>> getAllSpacecrafts(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "0") int page,
@@ -33,16 +32,16 @@ public class SpacecraftController {
             size = 50;
         }
 
-        PageResponseDTO<SpacecraftResponseDTO> response = spacecraftService.getSpacecrafts(name, status, page, size);
-
-        return ResponseEntity.ok()
-                .header("X-Total-Count", String.valueOf(response.totalElements()))
-                .body(response);
+        return spacecraftService.getSpacecrafts(name, status, page, size)
+                .map(response ->
+                        ResponseEntity.ok()
+                                .header("X-Total-Count", String.valueOf(response.totalElements()))
+                                .body(response)
+                );
     }
 
     @GetMapping("/scroll")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MISSION_COMMANDER')")
-    public ResponseEntity<List<SpacecraftResponseDTO>> getSpacecraftsScroll(
+    public Mono<ResponseEntity<List<SpacecraftResponseDTO>>> getSpacecraftsScroll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
 
@@ -50,55 +49,49 @@ public class SpacecraftController {
             size = 50;
         }
 
-        List<SpacecraftResponseDTO> response = spacecraftService.getSpacecraftsScroll(page, size);
-        return ResponseEntity.ok(response);
+        return spacecraftService.getSpacecraftsScroll(page, size)
+                .map(ResponseEntity::ok);
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MISSION_COMMANDER')")
-    public ResponseEntity<SpacecraftResponseDTO> getSpacecraftById(@PathVariable Long id) {
-        SpacecraftResponseDTO response = spacecraftService.getSpacecraftById(id);
-        return ResponseEntity.ok(response);
+    public Mono<ResponseEntity<SpacecraftResponseDTO>> getSpacecraftById(@PathVariable Long id) {
+        return spacecraftService.getSpacecraftById(id)
+                .map(ResponseEntity::ok);
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'MISSION_COMMANDER')")
-    public ResponseEntity<SpacecraftResponseDTO> createSpacecraft(@Valid @RequestBody SpacecraftRequestDTO request) {
-        SpacecraftResponseDTO response = spacecraftService.createSpacecraft(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public Mono<ResponseEntity<SpacecraftResponseDTO>> createSpacecraft(@Valid @RequestBody SpacecraftRequestDTO request) {
+        return spacecraftService.createSpacecraft(request)
+                .map(response -> ResponseEntity.status(HttpStatus.CREATED).body(response));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MISSION_COMMANDER')")
-    public ResponseEntity<SpacecraftResponseDTO> updateSpacecraft(
+    public Mono<ResponseEntity<SpacecraftResponseDTO>> updateSpacecraft(
             @PathVariable Long id,
             @Valid @RequestBody SpacecraftRequestDTO request) {
 
-        SpacecraftResponseDTO response = spacecraftService.updateSpacecraft(id, request);
-        return ResponseEntity.ok(response);
+        return spacecraftService.updateSpacecraft(id, request)
+                .map(ResponseEntity::ok);
     }
 
     @GetMapping("/available")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MISSION_COMMANDER', 'LOGISTICS_OFFICER')")
-    public ResponseEntity<List<SpacecraftResponseDTO>> getAvailableSpacecrafts() {
-        List<SpacecraftResponseDTO> response = spacecraftService.getAvailableSpacecrafts();
-        return ResponseEntity.ok(response);
+    public Mono<ResponseEntity<List<SpacecraftResponseDTO>>> getAvailableSpacecrafts() {
+        return spacecraftService.getAvailableSpacecrafts()
+                .map(ResponseEntity::ok);
     }
 
     @PutMapping("/{id}/status")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MISSION_COMMANDER', 'LOGISTICS_OFFICER')")
-    public ResponseEntity<SpacecraftResponseDTO> updateSpacecraftStatus(
+    public Mono<ResponseEntity<SpacecraftResponseDTO>> updateSpacecraftStatus(
             @PathVariable Long id,
             @RequestParam SpacecraftStatus status) {
 
-        SpacecraftResponseDTO response = spacecraftService.updateSpacecraftStatus(id, status);
-        return ResponseEntity.ok(response);
+        return spacecraftService.updateSpacecraftStatus(id, status)
+                .map(ResponseEntity::ok);
     }
 
     @GetMapping("/{id}/exists")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MAINTENANCE_ENGINEER', 'LOGISTICS_OFFICER')")
-    public ResponseEntity<Boolean> spacecraftExists(@PathVariable Long id) {
-        boolean exists = spacecraftService.spacecraftExists(id);
-        return ResponseEntity.ok(exists);
+    public Mono<ResponseEntity<Boolean>> spacecraftExists(@PathVariable Long id) {
+        return spacecraftService.spacecraftExists(id)
+                .map(ResponseEntity::ok);
     }
 }

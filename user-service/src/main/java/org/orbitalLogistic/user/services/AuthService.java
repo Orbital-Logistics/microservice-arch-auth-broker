@@ -1,18 +1,14 @@
 package org.orbitalLogistic.user.services;
 
-import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.orbitalLogistic.user.entities.Role;
 import org.orbitalLogistic.user.entities.User;
 import org.orbitalLogistic.user.exceptions.auth.*;
 import org.orbitalLogistic.user.exceptions.common.BadRequestException;
-import org.orbitalLogistic.user.exceptions.common.UnknownUsernameException;
+import org.orbitalLogistic.user.exceptions.auth.UnknownUsernameException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.AuthenticationException;
@@ -34,7 +30,6 @@ public class AuthService {
 
     @Transactional
     public String signUp(String username, String password, String email, Set<String> roles) {
-
         if (usersService.userExists(username)) {
             throw new UsernameAlreadyExistsException("");
         }
@@ -53,7 +48,7 @@ public class AuthService {
                 .enabled(true)
                 .build();
 
-        usersService.create(user);
+        usersService.createOrUpdateUser(user);
 
         return jwtService.generateToken(user);
     }

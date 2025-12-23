@@ -9,15 +9,3 @@ spring:
   cloud:
     config:
       fail-fast: false
-#Move to rep  o
-  jpa:
-    hibernate:
-      ddl-auto: none
-jwt:
-  expiration: 900
-  secret-key: "fbuVwHzCoJrhyC0UvnMeq8B6GXQ36uaqWKrb8a7Ch0Y"
-security:
-  root-user-name: "admin"
-  root-user-password: "odministrator"
-  root-user-email: "admin@corp.com"
-  root-user-role: "ADMIN"

@@ -2,8 +2,8 @@ package org.orbitalLogistic.spacecraft.clients;
 
 import java.util.function.Supplier;
 
+import org.orbitalLogistic.spacecraft.dto.common.SpacecraftCargoUsageDTO;
 import org.orbitalLogistic.spacecraft.exceptions.SpacecraftCargoUsageException;
-import org.orbitalLogistic.spacecraft.exceptions.SpacecraftNotFoundException;
 
 import org.springframework.stereotype.Component;
 
@@ -13,8 +13,6 @@ import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 
 @Component

@@ -9,6 +9,8 @@ import org.orbitalLogistic.spacecraft.mappers.SpacecraftTypeMapper;
 import org.orbitalLogistic.spacecraft.repositories.SpacecraftTypeRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 
@@ -20,20 +22,35 @@ public class SpacecraftTypeService {
     private final SpacecraftTypeMapper spacecraftTypeMapper;
     private final JdbcTemplate jdbcTemplate;
 
-    public List<SpacecraftTypeResponseDTO> getAllSpacecraftTypes() {
+    public Mono<List<SpacecraftTypeResponseDTO>> getAllSpacecraftTypes() {
+        return Mono.fromCallable(this::getAllSpacecraftTypesBlocking)
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    public List<SpacecraftTypeResponseDTO> getAllSpacecraftTypesBlocking() {
         List<SpacecraftType> types = (List<SpacecraftType>) spacecraftTypeRepository.findAll();
         return types.stream()
                 .map(spacecraftTypeMapper::toResponseDTO)
                 .toList();
     }
 
-    public SpacecraftTypeResponseDTO getSpacecraftTypeById(Long id) {
+    public Mono<SpacecraftTypeResponseDTO> getSpacecraftTypeById(Long id) {
+        return Mono.fromCallable(() -> getSpacecraftTypeByIdBlocking(id))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    public SpacecraftTypeResponseDTO getSpacecraftTypeByIdBlocking(Long id) {
         SpacecraftType type = spacecraftTypeRepository.findById(id)
                 .orElseThrow(() -> new SpacecraftTypeNotFoundException("Spacecraft type not found with id: " + id));
         return spacecraftTypeMapper.toResponseDTO(type);
     }
 
-    public SpacecraftTypeResponseDTO createSpacecraftType(SpacecraftTypeRequestDTO request) {
+    public Mono<SpacecraftTypeResponseDTO> createSpacecraftType(SpacecraftTypeRequestDTO request) {
+        return Mono.fromCallable(() -> createSpacecraftTypeBlocking(request))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    public SpacecraftTypeResponseDTO createSpacecraftTypeBlocking(SpacecraftTypeRequestDTO request) {
         String sql = "INSERT INTO spacecraft_type " +
                      "(type_name, classification, max_crew_capacity) " +
                      "VALUES (?, ?::spacecraft_classification_enum, ?) " +
@@ -51,7 +68,7 @@ public class SpacecraftTypeService {
         return spacecraftTypeMapper.toResponseDTO(saved);
     }
 
-    public SpacecraftType getEntityById(Long id) {
+    public SpacecraftType getEntityByIdBlocking(Long id) {
         return spacecraftTypeRepository.findById(id)
                 .orElseThrow(() -> new SpacecraftTypeNotFoundException("Spacecraft type not found with id: " + id));
     }

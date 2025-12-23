@@ -1,9 +1,8 @@
 package org.orbitalLogistic.spacecraft.services;
 
 import lombok.extern.slf4j.Slf4j;
-import org.orbitalLogistic.spacecraft.clients.CargoServiceClient;
 import org.orbitalLogistic.spacecraft.clients.ResilientCargoServiceClient;
-import org.orbitalLogistic.spacecraft.clients.SpacecraftCargoUsageDTO;
+import org.orbitalLogistic.spacecraft.dto.common.SpacecraftCargoUsageDTO;
 import org.orbitalLogistic.spacecraft.dto.common.PageResponseDTO;
 import org.orbitalLogistic.spacecraft.dto.request.SpacecraftRequestDTO;
 import org.orbitalLogistic.spacecraft.dto.response.SpacecraftResponseDTO;
@@ -20,6 +19,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -51,7 +52,12 @@ public class SpacecraftService {
         this.spacecraftTypeService = spacecraftTypeService;
     }
 
-    public PageResponseDTO<SpacecraftResponseDTO> getSpacecrafts(String name, String status, int page, int size) {
+    public Mono<PageResponseDTO<SpacecraftResponseDTO>> getSpacecrafts(String name, String status, int page, int size) {
+        return Mono.fromCallable(() -> getSpacecraftsBlocking(name, status, page, size))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    public PageResponseDTO<SpacecraftResponseDTO> getSpacecraftsBlocking(String name, String status, int page, int size) {
         int offset = page * size;
         List<Spacecraft> spacecrafts = spacecraftRepository.findWithFilters(name, status, size, offset);
         long total = spacecraftRepository.countWithFilters(name, status);
@@ -64,7 +70,12 @@ public class SpacecraftService {
         return new PageResponseDTO<>(spacecraftDTOs, page, size, total, totalPages, page == 0, page >= totalPages - 1);
     }
 
-    public List<SpacecraftResponseDTO> getSpacecraftsScroll(int page, int size) {
+    public Mono<List<SpacecraftResponseDTO>> getSpacecraftsScroll(int page, int size) {
+        return Mono.fromCallable(() -> getSpacecraftsScrollBlocking(page, size))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    public List<SpacecraftResponseDTO> getSpacecraftsScrollBlocking(int page, int size) {
         int offset = page * size;
         List<Spacecraft> spacecrafts = spacecraftRepository.findWithFilters(null, null, size + 1, offset);
 
@@ -74,18 +85,28 @@ public class SpacecraftService {
                 .toList();
     }
 
-    public SpacecraftResponseDTO getSpacecraftById(Long id) {
+    public Mono<SpacecraftResponseDTO> getSpacecraftById(Long id) {
+        return Mono.fromCallable(() -> getSpacecraftByIdBlocking(id))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    public SpacecraftResponseDTO getSpacecraftByIdBlocking(Long id) {
         Spacecraft spacecraft = spacecraftRepository.findById(id)
                 .orElseThrow(() -> new SpacecraftNotFoundException("Spacecraft not found with id: " + id));
         return toResponseDTO(spacecraft);
     }
 
-    public SpacecraftResponseDTO createSpacecraft(SpacecraftRequestDTO request) {
+    public Mono<SpacecraftResponseDTO> createSpacecraft(SpacecraftRequestDTO request) {
+        return Mono.fromCallable(() -> createSpacecraftBlocking(request))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    public SpacecraftResponseDTO createSpacecraftBlocking(SpacecraftRequestDTO request) {
         if (spacecraftRepository.existsByRegistryCode(request.registryCode())) {
             throw new SpacecraftAlreadyExistsException("Spacecraft with registry code already exists: " + request.registryCode());
         }
 
-        spacecraftTypeService.getEntityById(request.spacecraftTypeId());
+        spacecraftTypeService.getEntityByIdBlocking(request.spacecraftTypeId());
 
         String sql = "INSERT INTO spacecraft " +
                      "(registry_code, name, spacecraft_type_id, mass_capacity, volume_capacity, status, current_location) " +
@@ -108,7 +129,12 @@ public class SpacecraftService {
         return toResponseDTO(saved);
     }
 
-    public SpacecraftResponseDTO updateSpacecraft(Long id, SpacecraftRequestDTO request) {
+    public Mono<SpacecraftResponseDTO> updateSpacecraft(Long id, SpacecraftRequestDTO request) {
+        return Mono.fromCallable(() -> updateSpacecraftBlocking(id, request))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    public SpacecraftResponseDTO updateSpacecraftBlocking(Long id, SpacecraftRequestDTO request) {
         Spacecraft spacecraft = spacecraftRepository.findById(id)
                 .orElseThrow(() -> new SpacecraftNotFoundException("Spacecraft not found with id: " + id));
 
@@ -117,7 +143,7 @@ public class SpacecraftService {
             throw new SpacecraftAlreadyExistsException("Spacecraft with registry code already exists: " + request.registryCode());
         }
 
-        spacecraftTypeService.getEntityById(request.spacecraftTypeId());
+        spacecraftTypeService.getEntityByIdBlocking(request.spacecraftTypeId());
 
         String sql = "UPDATE spacecraft SET " +
                      "registry_code = ?, " +
@@ -152,19 +178,34 @@ public class SpacecraftService {
     }
 
     public void deleteSpacecraft(Long id) {
+        Mono.<Void>fromRunnable(() -> deleteSpacecraftBlocking(id))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    public void deleteSpacecraftBlocking(Long id) {
         if (!spacecraftRepository.existsById(id)) {
             throw new SpacecraftNotFoundException("Spacecraft not found with id: " + id);
         }
         spacecraftRepository.deleteById(id);
     }
 
-    public List<SpacecraftResponseDTO> getAvailableSpacecrafts() {
+    public Mono<List<SpacecraftResponseDTO>> getAvailableSpacecrafts() {
+        return Mono.fromCallable(this::getAvailableSpacecraftsBlocking)
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    public List<SpacecraftResponseDTO> getAvailableSpacecraftsBlocking() {
         return spacecraftRepository.findAvailableForMission().stream()
                 .map(this::toResponseDTO)
                 .toList();
     }
 
-    public SpacecraftResponseDTO updateSpacecraftStatus(Long id, SpacecraftStatus status) {
+    public Mono<SpacecraftResponseDTO> updateSpacecraftStatus(Long id, SpacecraftStatus status) {
+        return Mono.fromCallable(() -> updateSpacecraftStatusBlocking(id, status))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    public SpacecraftResponseDTO updateSpacecraftStatusBlocking(Long id, SpacecraftStatus status) {
         Spacecraft spacecraft = spacecraftRepository.findById(id)
                 .orElseThrow(() -> new SpacecraftNotFoundException("Spacecraft not found with id: " + id));
 
@@ -175,7 +216,13 @@ public class SpacecraftService {
         return toResponseDTO(spacecraft);
     }
 
-    public SpacecraftResponseDTO changeSpacecraftLocation(Long id, String newLocation) {
+    public Mono<SpacecraftResponseDTO> changeSpacecraftLocation(Long id, String newLocation) {
+        return Mono.fromCallable(() -> changeSpacecraftLocationBlocking(id, newLocation))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+
+    public SpacecraftResponseDTO changeSpacecraftLocationBlocking(Long id, String newLocation) {
         Spacecraft spacecraft = spacecraftRepository.findById(id)
                 .orElseThrow(() -> new SpacecraftNotFoundException("Spacecraft not found with id: " + id));
 
@@ -186,30 +233,56 @@ public class SpacecraftService {
         return toResponseDTO(spacecraft);
     }
 
-    public SpacecraftResponseDTO putSpacecraftInMaintenance(Long id) {
-        return updateSpacecraftStatus(id, SpacecraftStatus.MAINTENANCE);
+    public Mono<SpacecraftResponseDTO> putSpacecraftInMaintenance(Long id) {
+        return Mono.fromCallable(() -> putSpacecraftInMaintenanceBlocking(id))
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
-    public SpacecraftResponseDTO putSpacecraftInTransit(Long id) {
-        return updateSpacecraftStatus(id, SpacecraftStatus.IN_TRANSIT);
+    public SpacecraftResponseDTO putSpacecraftInMaintenanceBlocking(Long id) {
+        return updateSpacecraftStatusBlocking(id, SpacecraftStatus.MAINTENANCE);
     }
 
-    public SpacecraftResponseDTO dockSpacecraft(Long id, String location) {
-        SpacecraftResponseDTO response = changeSpacecraftLocation(id, location);
-        return updateSpacecraftStatus(id, SpacecraftStatus.DOCKED);
+    public Mono<SpacecraftResponseDTO> putSpacecraftInTransit(Long id) {
+        return Mono.fromCallable(() -> putSpacecraftInTransitBlocking(id))
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
-    public Spacecraft getEntityById(Long id) {
+
+    public SpacecraftResponseDTO putSpacecraftInTransitBlocking(Long id) {
+        return updateSpacecraftStatusBlocking(id, SpacecraftStatus.IN_TRANSIT);
+    }
+
+    public Mono<SpacecraftResponseDTO> dockSpacecraft(Long id, String location) {
+        return Mono.fromCallable(() -> dockSpacecraftBlocking(id, location))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    public SpacecraftResponseDTO dockSpacecraftBlocking(Long id, String location) {
+        SpacecraftResponseDTO response = changeSpacecraftLocationBlocking(id, location);
+        return updateSpacecraftStatusBlocking(id, SpacecraftStatus.DOCKED);
+    }
+
+    public Mono<Spacecraft> getEntityById(Long id) {
+        return Mono.fromCallable(() -> getEntityByIdBlocking(id))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    public Spacecraft getEntityByIdBlocking(Long id) {
         return spacecraftRepository.findById(id)
                 .orElseThrow(() -> new SpacecraftNotFoundException("Spacecraft not found with id: " + id));
     }
 
-    public boolean spacecraftExists(Long id) {
+    public Mono<Boolean> spacecraftExists(Long id) {
+        return Mono.fromCallable(() -> spacecraftExistsBlocking(id))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    public boolean spacecraftExistsBlocking(Long id) {
         return spacecraftRepository.existsById(id);
     }
 
     private SpacecraftResponseDTO toResponseDTO(Spacecraft spacecraft) {
-        SpacecraftType spacecraftType = spacecraftTypeService.getEntityById(spacecraft.getSpacecraftTypeId());
+        SpacecraftType spacecraftType = spacecraftTypeService.getEntityByIdBlocking(spacecraft.getSpacecraftTypeId());
 
         BigDecimal currentMassUsage = BigDecimal.ZERO;
         BigDecimal currentVolumeUsage = BigDecimal.ZERO;

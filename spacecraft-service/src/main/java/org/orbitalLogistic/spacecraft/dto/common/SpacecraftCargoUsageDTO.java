@@ -1,4 +1,4 @@
-package org.orbitalLogistic.spacecraft.clients;
+package org.orbitalLogistic.spacecraft.dto.common;
 
 import java.math.BigDecimal;
 
