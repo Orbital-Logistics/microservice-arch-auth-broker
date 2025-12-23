@@ -10,3 +10,5 @@ spring:
   cloud:
     config:
       fail-fast: false
+jwt:
+  secret-key: "fbuVwHzCoJrhyC0UvnMeq8B6GXQ36uaqWKrb8a7Ch0Y"

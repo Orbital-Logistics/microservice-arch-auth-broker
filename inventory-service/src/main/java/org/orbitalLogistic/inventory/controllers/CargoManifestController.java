@@ -8,6 +8,7 @@ import org.orbitalLogistic.inventory.dto.response.CargoManifestResponseDTO;
 import org.orbitalLogistic.inventory.services.CargoManifestService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,6 +19,7 @@ public class CargoManifestController {
     private final CargoManifestService cargoManifestService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or #request.username == authentication.name")
     public ResponseEntity<PageResponseDTO<CargoManifestResponseDTO>> getAllManifests(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
@@ -31,6 +33,7 @@ public class CargoManifestController {
     }
 
     @GetMapping("/spacecraft/{spacecraftId}")
+    @PreAuthorize("hasRole('ADMIN') or #request.username == authentication.name")
     public ResponseEntity<PageResponseDTO<CargoManifestResponseDTO>> getManifestsBySpacecraft(
             @PathVariable Long spacecraftId,
             @RequestParam(defaultValue = "0") int page,
@@ -46,12 +49,14 @@ public class CargoManifestController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or #request.username == authentication.name")
     public ResponseEntity<CargoManifestResponseDTO> getManifestById(@PathVariable Long id) {
         CargoManifestResponseDTO response = cargoManifestService.getManifestById(id);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'LOGISTICS_OFFICER')")
     public ResponseEntity<CargoManifestResponseDTO> createManifest(
             @Valid @RequestBody CargoManifestRequestDTO request) {
 
@@ -60,6 +65,7 @@ public class CargoManifestController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'LOGISTICS_OFFICER')")
     public ResponseEntity<CargoManifestResponseDTO> updateManifest(
             @PathVariable Long id,
             @Valid @RequestBody CargoManifestRequestDTO request) {

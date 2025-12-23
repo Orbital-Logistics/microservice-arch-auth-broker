@@ -8,7 +8,9 @@ import org.orbitalLogistic.cargo.dto.request.CargoCategoryRequestDTO;
 import org.orbitalLogistic.cargo.dto.response.CargoCategoryResponseDTO;
 import org.orbitalLogistic.cargo.exceptions.CargoCategoryNotFoundException;
 import org.orbitalLogistic.cargo.services.CargoCategoryService;
+import org.orbitalLogistic.cargo.services.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
@@ -24,6 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CargoCategoryController.class)
+@AutoConfigureMockMvc(addFilters = false)
 @TestPropertySource(properties = {
         "spring.cloud.config.enabled=false"
 })
@@ -37,6 +40,9 @@ class CargoCategoryControllerTest {
 
     @MockitoBean
     private CargoCategoryService cargoCategoryService;
+
+    @MockitoBean
+    private JwtService jwtService;
 
     private CargoCategoryResponseDTO responseDTO;
     private CargoCategoryRequestDTO requestDTO;

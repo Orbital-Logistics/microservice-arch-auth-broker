@@ -20,6 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -38,6 +39,7 @@ import static org.mockito.Mockito.when;
 @AutoConfigureWebTestClient
 @Testcontainers
 @ActiveProfiles("test")
+@Import(org.orbitalLogistic.maintenance.config.TestSecurityConfig.class)
 @Tag("integration-tests")
 @TestPropertySource(properties = {
         "spring.cloud.config.enabled=false"

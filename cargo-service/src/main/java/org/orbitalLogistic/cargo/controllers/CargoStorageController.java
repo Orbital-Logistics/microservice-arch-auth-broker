@@ -8,6 +8,7 @@ import org.orbitalLogistic.cargo.dto.response.CargoStorageResponseDTO;
 import org.orbitalLogistic.cargo.services.CargoStorageService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,6 +19,7 @@ public class CargoStorageController {
     private final CargoStorageService cargoStorageService;
 
     @GetMapping("/cargo-storage")
+    @PreAuthorize("hasRole('ADMIN') or #request.username == authentication.name")
     public ResponseEntity<PageResponseDTO<CargoStorageResponseDTO>> getAllCargoStorage(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
@@ -27,6 +29,7 @@ public class CargoStorageController {
     }
 
     @PostMapping("/cargo-storage")
+    @PreAuthorize("hasAnyRole('ADMIN', 'LOGISTICS_OFFICER')")
     public ResponseEntity<CargoStorageResponseDTO> addCargoToStorage(
             @Valid @RequestBody CargoStorageRequestDTO request) {
 
@@ -35,6 +38,7 @@ public class CargoStorageController {
     }
 
     @PutMapping("/cargo-storage/{id}/quantity")
+    @PreAuthorize("hasAnyRole('ADMIN', 'LOGISTICS_OFFICER')")
     public ResponseEntity<CargoStorageResponseDTO> updateCargoQuantity(
             @PathVariable Long id,
             @Valid @RequestBody CargoStorageRequestDTO request) {
@@ -44,6 +48,7 @@ public class CargoStorageController {
     }
 
     @GetMapping("/storage-units/{id}/storage")
+    @PreAuthorize("hasRole('ADMIN') or #request.username == authentication.name")
     public ResponseEntity<PageResponseDTO<CargoStorageResponseDTO>> getStorageUnitCargo(
             @PathVariable Long id,
             @RequestParam(defaultValue = "0") int page,

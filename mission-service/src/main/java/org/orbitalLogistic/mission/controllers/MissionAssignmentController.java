@@ -8,6 +8,7 @@ import org.orbitalLogistic.mission.dto.response.MissionAssignmentResponseDTO;
 import org.orbitalLogistic.mission.services.MissionAssignmentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
@@ -46,6 +47,7 @@ public class MissionAssignmentController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or #request.username == authentication.name")
     public ResponseEntity<PageResponseDTO<MissionAssignmentResponseDTO>> getAllAssignments(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
@@ -59,30 +61,35 @@ public class MissionAssignmentController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or #request.username == authentication.name")
     public ResponseEntity<MissionAssignmentResponseDTO> getAssignmentById(@PathVariable Long id) {
         MissionAssignmentResponseDTO response = missionAssignmentService.getAssignmentById(id);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/mission/{missionId}")
+    @PreAuthorize("hasRole('ADMIN') or #request.username == authentication.name")
     public ResponseEntity<List<MissionAssignmentResponseDTO>> getAssignmentsByMission(@PathVariable Long missionId) {
         List<MissionAssignmentResponseDTO> response = missionAssignmentService.getAssignmentsByMission(missionId);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/user/{userId}")
+    @PreAuthorize("hasRole('ADMIN') or #request.username == authentication.name")
     public ResponseEntity<List<MissionAssignmentResponseDTO>> getAssignmentsByUser(@PathVariable Long userId) {
         List<MissionAssignmentResponseDTO> response = missionAssignmentService.getAssignmentsByUser(userId);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'MISSION_COMMANDER')")
     public ResponseEntity<MissionAssignmentResponseDTO> createAssignment(@Valid @RequestBody MissionAssignmentRequestDTO request) {
         MissionAssignmentResponseDTO response = missionAssignmentService.createAssignment(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MISSION_COMMANDER')")
     public ResponseEntity<Void> deleteAssignment(@PathVariable Long id) {
         missionAssignmentService.deleteAssignment(id);
         return ResponseEntity.noContent().build();

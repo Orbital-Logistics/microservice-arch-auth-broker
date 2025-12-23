@@ -26,7 +26,6 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
 public class SecurityConfiguration {
 
     private final JwtAuthFilter jwtAuthFilter;
-    private final UserService userService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -54,12 +53,12 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    public static PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider() {
+    public AuthenticationProvider authenticationProvider(UserService userService) {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userService.userDetailsService());
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;

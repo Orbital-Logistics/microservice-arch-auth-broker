@@ -9,12 +9,15 @@ import org.orbitalLogistic.maintenance.entities.enums.MaintenanceStatus;
 import org.orbitalLogistic.maintenance.entities.enums.MaintenanceType;
 import org.orbitalLogistic.maintenance.exceptions.InvalidOperationException;
 import org.orbitalLogistic.maintenance.exceptions.MaintenanceLogNotFoundException;
+import org.orbitalLogistic.maintenance.services.JwtService;
 import org.orbitalLogistic.maintenance.services.MaintenanceLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.context.annotation.Import;
+import org.orbitalLogistic.maintenance.config.TestSecurityConfig;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -30,6 +33,7 @@ import static org.mockito.Mockito.*;
 @TestPropertySource(properties = {
         "spring.cloud.config.enabled=false"
 })
+@Import(TestSecurityConfig.class)
 class MaintenanceLogControllerTest {
 
     @Autowired
@@ -37,6 +41,9 @@ class MaintenanceLogControllerTest {
 
     @MockitoBean
     private MaintenanceLogService maintenanceLogService;
+
+    @MockitoBean
+    private JwtService jwtService;
 
     private MaintenanceLogResponseDTO responseDTO;
     private MaintenanceLogRequestDTO requestDTO;

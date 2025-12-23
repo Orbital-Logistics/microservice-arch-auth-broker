@@ -9,8 +9,10 @@ import org.orbitalLogistic.mission.dto.request.SpacecraftMissionRequestDTO;
 import org.orbitalLogistic.mission.dto.response.SpacecraftMissionResponseDTO;
 import org.orbitalLogistic.mission.exceptions.MissionNotFoundException;
 import org.orbitalLogistic.mission.exceptions.MissionSpacecraftExistsException;
+import org.orbitalLogistic.mission.services.JwtService;
 import org.orbitalLogistic.mission.services.SpacecraftMissionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
@@ -26,6 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(SpacecraftMissionController.class)
+@AutoConfigureMockMvc(addFilters = false)
 @TestPropertySource(properties = {
         "spring.cloud.config.enabled=false"
 })
@@ -39,6 +42,9 @@ class SpacecraftMissionControllerTest {
 
     @MockitoBean
     private SpacecraftMissionService spacecraftMissionService;
+
+    @MockitoBean
+    private JwtService jwtService;
 
     private SpacecraftMissionResponseDTO spacecraftMissionResponse;
     private SpacecraftMissionRequestDTO spacecraftMissionRequest;

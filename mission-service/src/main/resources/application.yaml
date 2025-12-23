@@ -13,30 +13,6 @@ spring:
       retry:
         max-attempts: 20
         initial-interval: 3000
-
-# Resilience4j Configuration
-# resilience4j:
-#   circuitbreaker:
-#     enabled: true
-#     instances:
-#       userService:
-#         registerHealthIndicator: true
-#         slidingWindowType: COUNT_BASED
-#         slidingWindowSize: 10
-#         minimumNumberOfCalls: 1
-#         waitDurationInOpenState: 3s
-#         permittedNumberOfCallsInHalfOpenState: 3
-#         failureRateThreshold: 10
-#         slowCallRateThreshold: 100
-#         slowCallDurationThreshold: 1s
-#       spacecraftService:
-#         registerHealthIndicator: true
-#         slidingWindowType: COUNT_BASED
-#         slidingWindowSize: 10
-#         minimumNumberOfCalls: 5
-#         waitDurationInOpenState: 15s
-#         permittedNumberOfCallsInHalfOpenState: 2
-#         failureRateThreshold: 30
-#         slowCallRateThreshold: 100
-#         slowCallDurationThreshold: 5s
+jwt:
+  secret-key: "fbuVwHzCoJrhyC0UvnMeq8B6GXQ36uaqWKrb8a7Ch0Y"
 

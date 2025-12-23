@@ -9,6 +9,7 @@ import org.orbitalLogistic.maintenance.dto.response.MaintenanceLogResponseDTO;
 import org.orbitalLogistic.maintenance.services.MaintenanceLogService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -23,6 +24,7 @@ public class MaintenanceLogController {
     private final MaintenanceLogService maintenanceLogService;
 
     @GetMapping("/maintenance-logs")
+    @PreAuthorize("hasRole('ADMIN') or #request.username == authentication.name")
     public Mono<ResponseEntity<Flux<MaintenanceLogResponseDTO>>> getAllMaintenanceLogs(
             @RequestParam(defaultValue = "0")
             @Min(value = 0, message = "Page must be >= 0")
@@ -42,6 +44,7 @@ public class MaintenanceLogController {
     }
 
     @PostMapping("/maintenance-logs")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MAINTENANCE_ENGINEER')")
     public Mono<ResponseEntity<MaintenanceLogResponseDTO>> createMaintenanceLog(
             @Valid @RequestBody MaintenanceLogRequestDTO request) {
 
@@ -53,6 +56,7 @@ public class MaintenanceLogController {
     }
 
     @PutMapping("/maintenance-logs/{id}/status")
+    @PreAuthorize("hasAnyRole('ADMIN', 'LOGISTICS_OFFICER')")
     public Mono<ResponseEntity<MaintenanceLogResponseDTO>> updateMaintenanceStatus(
             @PathVariable Long id,
             @RequestBody MaintenanceLogRequestDTO request) {
@@ -62,6 +66,7 @@ public class MaintenanceLogController {
     }
 
     @GetMapping("/spacecrafts/{id}/maintenance")
+    @PreAuthorize("hasRole('ADMIN') or #request.username == authentication.name")
     public Mono<ResponseEntity<Flux<MaintenanceLogResponseDTO>>> getSpacecraftMaintenanceHistory(
             @PathVariable Long id,
             @RequestParam(defaultValue = "0")

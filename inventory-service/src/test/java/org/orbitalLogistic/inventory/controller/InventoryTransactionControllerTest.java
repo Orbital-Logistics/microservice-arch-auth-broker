@@ -10,7 +10,9 @@ import org.orbitalLogistic.inventory.dto.request.InventoryTransactionRequestDTO;
 import org.orbitalLogistic.inventory.dto.response.InventoryTransactionResponseDTO;
 import org.orbitalLogistic.inventory.entities.enums.TransactionType;
 import org.orbitalLogistic.inventory.services.InventoryTransactionService;
+import org.orbitalLogistic.inventory.services.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
@@ -27,6 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(InventoryTransactionController.class)
+@AutoConfigureMockMvc(addFilters = false)
 @TestPropertySource(properties = {
         "spring.cloud.config.enabled=false"
 })
@@ -40,6 +43,9 @@ class InventoryTransactionControllerTest {
 
     @MockitoBean
     private InventoryTransactionService inventoryTransactionService;
+
+    @MockitoBean
+    private JwtService jwtService;
 
     private InventoryTransactionResponseDTO transactionResponse;
     private InventoryTransactionRequestDTO transactionRequest;

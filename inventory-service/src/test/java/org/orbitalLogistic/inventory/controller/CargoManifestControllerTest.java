@@ -12,7 +12,9 @@ import org.orbitalLogistic.inventory.entities.enums.ManifestPriority;
 import org.orbitalLogistic.inventory.entities.enums.ManifestStatus;
 import org.orbitalLogistic.inventory.exceptions.CargoManifestNotFoundException;
 import org.orbitalLogistic.inventory.services.CargoManifestService;
+import org.orbitalLogistic.inventory.services.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
@@ -30,6 +32,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CargoManifestController.class)
+@AutoConfigureMockMvc(addFilters = false)
 @TestPropertySource(properties = {
         "spring.cloud.config.enabled=false"
 })
@@ -43,6 +46,9 @@ class CargoManifestControllerTest {
 
     @MockitoBean
     private CargoManifestService cargoManifestService;
+
+    @MockitoBean
+    private JwtService jwtService;
 
     private CargoManifestResponseDTO manifestResponse;
     private CargoManifestRequestDTO manifestRequest;

@@ -7,6 +7,7 @@ import org.orbitalLogistic.cargo.dto.response.CargoResponseDTO;
 import org.orbitalLogistic.cargo.services.CargoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class CargoController {
     private final CargoService cargoService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or #request.username == authentication.name")
     public ResponseEntity<List<CargoResponseDTO>> getAllCargos(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
@@ -30,6 +32,7 @@ public class CargoController {
     }
 
     @GetMapping("/paged")
+    @PreAuthorize("hasRole('ADMIN') or #request.username == authentication.name")
     public ResponseEntity<PageResponseDTO<CargoResponseDTO>> getAllCargosPaged(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String cargoType,
@@ -48,18 +51,21 @@ public class CargoController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or #request.username == authentication.name")
     public ResponseEntity<CargoResponseDTO> getCargoById(@PathVariable Long id) {
         CargoResponseDTO response = cargoService.getCargoById(id);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'LOGISTICS_OFFICER')")
     public ResponseEntity<CargoResponseDTO> createCargo(@Valid @RequestBody CargoRequestDTO request) {
         CargoResponseDTO response = cargoService.createCargo(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'LOGISTICS_OFFICER')")
     public ResponseEntity<CargoResponseDTO> updateCargo(
             @PathVariable Long id,
             @Valid @RequestBody CargoRequestDTO request) {
@@ -69,12 +75,14 @@ public class CargoController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'LOGISTICS_OFFICER')")
     public ResponseEntity<Void> deleteCargo(@PathVariable Long id) {
         cargoService.deleteCargo(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/search")
+    @PreAuthorize("hasRole('ADMIN') or #request.username == authentication.name")
     public ResponseEntity<PageResponseDTO<CargoResponseDTO>> searchCargos(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String cargoType,
@@ -93,6 +101,7 @@ public class CargoController {
     }
 
     @GetMapping("/{id}/exists")
+    @PreAuthorize("hasRole('ADMIN') or #request.username == authentication.name")
     public ResponseEntity<Boolean> cargoExists(@PathVariable Long id) {
         boolean exists = cargoService.cargoExists(id);
         return ResponseEntity.ok(exists);
