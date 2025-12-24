@@ -16,9 +16,10 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.context.annotation.Import;
-import org.orbitalLogistic.maintenance.config.TestSecurityConfig;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.context.annotation.Import;
+
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockUser;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -33,7 +34,7 @@ import static org.mockito.Mockito.*;
 @TestPropertySource(properties = {
         "spring.cloud.config.enabled=false"
 })
-@Import(TestSecurityConfig.class)
+@Import(org.orbitalLogistic.maintenance.config.TestSecurityConfig.class)
 class MaintenanceLogControllerTest {
 
     @Autowired
@@ -51,6 +52,8 @@ class MaintenanceLogControllerTest {
     @BeforeEach
     void setUp() {
         LocalDateTime now = LocalDateTime.now();
+
+        webTestClient = webTestClient.mutateWith(mockUser().roles("ADMIN"));
 
         responseDTO = new MaintenanceLogResponseDTO(
                 1L,
@@ -363,4 +366,3 @@ class MaintenanceLogControllerTest {
         verify(maintenanceLogService).countBySpacecraftId(999L);
     }
 }
-

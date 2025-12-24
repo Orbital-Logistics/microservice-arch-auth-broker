@@ -16,3 +16,13 @@ spring:
 eureka:
   client:
     enabled: false
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY:yourSuperSecretKeyAtLeast256BitsLongForProductionChangeThis}
+  expiration: ${JWT_EXPIRATION:900}
+
+security:
+  root-user-name: "testadmin"
+  root-user-password: "testpass"
+  root-user-email: "testadmin@example.com"
+  root-user-role: "ADMIN"

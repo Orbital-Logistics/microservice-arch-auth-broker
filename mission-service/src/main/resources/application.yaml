@@ -13,6 +13,4 @@ spring:
       retry:
         max-attempts: 20
         initial-interval: 3000
-jwt:
-  secret-key: "fbuVwHzCoJrhyC0UvnMeq8B6GXQ36uaqWKrb8a7Ch0Y"
 

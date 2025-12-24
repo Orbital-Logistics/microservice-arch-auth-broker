@@ -15,14 +15,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockUser;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -39,11 +40,11 @@ import static org.mockito.Mockito.when;
 @AutoConfigureWebTestClient
 @Testcontainers
 @ActiveProfiles("test")
-@Import(org.orbitalLogistic.maintenance.config.TestSecurityConfig.class)
 @Tag("integration-tests")
 @TestPropertySource(properties = {
         "spring.cloud.config.enabled=false"
 })
+@Import(org.orbitalLogistic.maintenance.config.TestSecurityConfig.class)
 class MaintenanceLogIntegrationTest {
 
     @Container
@@ -77,6 +78,8 @@ class MaintenanceLogIntegrationTest {
     @BeforeEach
     void setUp() {
         maintenanceLogRepository.deleteAll().block();
+
+        webTestClient = webTestClient.mutateWith(mockUser().roles("ADMIN"));
 
         when(spacecraftServiceClient.spacecraftExists(anyLong())).thenReturn(true);
         when(spacecraftServiceClient.getSpacecraftById(anyLong()))

@@ -1,26 +1,21 @@
-#spring:
-#  application:
-#    name: spacecraft-service-test
-#
-#  flyway:
-#    baseline-on-migrate: true
-#
-#  cloud:
-#    config:
-#      enabled: false
-#
-#eureka:
-#  client:
-#    enabled: false
-#
-#feign:
-#    circuitbreaker:
-#      enabled: false
-#
-#
-#
-#
-#
-#
-#
-#
+spring:
+  application:
+    name: spacecraft-service-test
+
+  flyway:
+    baseline-on-migrate: true
+
+  cloud:
+    config:
+      enabled: false
+
+eureka:
+  client:
+    enabled: false
+
+feign:
+    circuitbreaker:
+      enabled: false
+jwt:
+  secret-key: ${JWT_SECRET_KEY:yourSuperSecretKeyAtLeast256BitsLongForProductionChangeThis}
+

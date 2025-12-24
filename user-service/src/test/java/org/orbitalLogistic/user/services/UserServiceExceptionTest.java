@@ -1,89 +1,67 @@
-//package org.orbitalLogistic.user.services;
-//
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//import org.mockito.junit.jupiter.MockitoExtension;
-//import org.orbitalLogistic.user.entities.User;
-//import org.orbitalLogistic.user.exceptions.common.DataNotFoundException;
-//import org.orbitalLogistic.user.exceptions.user.UserAlreadyExistsException;
-//import org.orbitalLogistic.user.exceptions.user.UserNotFoundException;
-//import org.orbitalLogistic.user.mappers.UserMapper;
-//
-//import static org.junit.jupiter.api.Assertions.*;
-//import static org.mockito.ArgumentMatchers.any;
-//import static org.mockito.Mockito.*;
-//
-//@ExtendWith(MockitoExtension.class)
-//class UserServiceExceptionTest {
-//
-//    @Mock
-//    private UserRepository userRepository;
-//
-//    @Mock
-//    private UserRoleRepository roleRepository;
-//
-//    @Mock
-//    private UserMapper userMapper;
-//
-//    @InjectMocks
-//    private UserService userService;
-//
-//    @Test
-//    void registerUser_EmailExists() {
-//        var req = mock(org.orbitalLogistic.user.dto.request.SignUpRequestDTO.class);
-//        when(req.email()).thenReturn("a@b.com");
-//        when(userRepository.existsByEmail("a@b.com")).thenReturn(true);
-//
-//        assertThrows(UserAlreadyExistsException.class, () -> userService.registerUser(req).block());
-//    }
-//
-//    @Test
-//    void registerUser_UsernameExists() {
-//        var req = mock(org.orbitalLogistic.user.dto.request.SignUpRequestDTO.class);
-//        when(req.email()).thenReturn("a@b.com");
-//        when(req.username()).thenReturn("existing");
-//        when(userRepository.existsByEmail("a@b.com")).thenReturn(false);
-//        when(userRepository.existsByUsername("existing")).thenReturn(true);
-//
-//        assertThrows(UserAlreadyExistsException.class, () -> userService.registerUser(req).block());
-//    }
-//
-//    @Test
-//    void findUserById_NotFound() {
-//        when(userRepository.findById(1L)).thenReturn(java.util.Optional.empty());
-//        assertThrows(UserNotFoundException.class, () -> userService.findUserById(1L).block());
-//    }
-//
-//    @Test
-//    void registerUser_RoleNotFound() {
-//        var req = mock(org.orbitalLogistic.user.dto.request.SignUpRequestDTO.class);
-//        when(req.email()).thenReturn("x@x.com");
-//        when(req.username()).thenReturn("u");
-//        when(req.password()).thenReturn("p");
-//
-//        when(userRepository.existsByEmail("x@x.com")).thenReturn(false);
-//        when(userRepository.existsByUsername("u")).thenReturn(false);
-//
-//        User mappedUser = new User();
-//        when(userMapper.toEntity(any())).thenReturn(mappedUser);
-//
-//        when(roleRepository.findByName("logistics_officer")).thenReturn(java.util.Optional.empty());
-//
-//        assertThrows(DataNotFoundException.class, () -> userService.registerUser(req).block());
-//    }
-//
-//    @Test
-//    void updateUser_NotFound() {
-//        var req = mock(org.orbitalLogistic.user.dto.request.UpdateUserRequestDTO.class);
-//        when(userRepository.findById(42L)).thenReturn(java.util.Optional.empty());
-//        assertThrows(UserNotFoundException.class, () -> userService.updateUser(42L, req).block());
-//    }
-//
-//    @Test
-//    void deleteUser_NotFound() {
-//        when(userRepository.existsById(99L)).thenReturn(false);
-//        assertThrows(UserNotFoundException.class, () -> userService.deleteUser(99L).block());
-//    }
-//}
+package org.orbitalLogistic.user.services;
+
+import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.orbitalLogistic.user.entities.User;
+import org.orbitalLogistic.user.repositories.UserRepository;
+import org.orbitalLogistic.user.exceptions.auth.UnknownUsernameException;
+import org.orbitalLogistic.user.exceptions.common.BadRequestException;
+
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class UserServiceExceptionTest {
+
+    @Mock
+    private UserRepository userRepository;
+
+    @InjectMocks
+    private UserService userService;
+
+    @Test
+    void updateUser_NotFound_ThrowsUnknownUsernameException() {
+        when(userRepository.findByUsername("missing")).thenReturn(Optional.empty());
+
+        assertThrows(UnknownUsernameException.class, () -> userService.updateUser("missing", "newName", null));
+
+        verify(userRepository).findByUsername("missing");
+    }
+
+    @Test
+    void updateUser_EmptyNewUsername_ThrowsBadRequestException() {
+        User existing = new User();
+        existing.setUsername("old");
+        existing.setEmail("old@x.com");
+
+        when(userRepository.findByUsername("old")).thenReturn(Optional.of(existing));
+
+        assertThrows(BadRequestException.class, () -> userService.updateUser("old", "", null));
+
+        verify(userRepository).findByUsername("old");
+    }
+
+    @Test
+    void getByUsername_NotFound_ThrowsEntityNotFoundException() {
+        when(userRepository.findByUsername("noone")).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> userService.getByUsername("noone"));
+
+        verify(userRepository).findByUsername("noone");
+    }
+
+    @Test
+    void deleteUser_CallsRepositoryDeleteById() {
+        doNothing().when(userRepository).deleteById(99L);
+
+        userService.deleteUser(99L);
+
+        verify(userRepository).deleteById(99L);
+    }
+}

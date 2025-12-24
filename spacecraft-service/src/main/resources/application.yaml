@@ -10,7 +10,5 @@ spring:
     config:
       fail-fast: false
       allow-override: true
-jwt:
-  secret-key: "fbuVwHzCoJrhyC0UvnMeq8B6GXQ36uaqWKrb8a7Ch0Y"
 
 

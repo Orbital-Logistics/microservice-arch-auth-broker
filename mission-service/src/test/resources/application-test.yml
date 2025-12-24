@@ -17,3 +17,5 @@ feign:
   circuitbreaker:
     enabled: false
 
+jwt:
+  secret-key: ${JWT_SECRET_KEY:yourSuperSecretKeyAtLeast256BitsLongForProductionChangeThis}
