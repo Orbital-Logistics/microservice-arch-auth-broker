@@ -5,7 +5,6 @@ import org.orbitalLogistic.maintenance.dto.common.SpacecraftDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import reactor.core.publisher.Mono;
 
 @FeignClient(name = "spacecraft-service", path = "/api/spacecrafts", configuration = FeignConfig.class)
 public interface SpacecraftServiceFeignClient {

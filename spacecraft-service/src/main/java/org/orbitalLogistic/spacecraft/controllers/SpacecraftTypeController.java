@@ -7,6 +7,7 @@ import org.orbitalLogistic.spacecraft.dto.response.SpacecraftTypeResponseDTO;
 import org.orbitalLogistic.spacecraft.services.SpacecraftTypeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -32,6 +33,7 @@ public class SpacecraftTypeController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'LOGISTICS_OFFICER')")
     public Mono<ResponseEntity<SpacecraftTypeResponseDTO>> createSpacecraftType(@Valid @RequestBody SpacecraftTypeRequestDTO request) {
         return spacecraftTypeService.createSpacecraftType(request)
                 .map(response ->

@@ -9,6 +9,7 @@ import org.orbitalLogistic.spacecraft.entities.enums.SpacecraftStatus;
 import org.orbitalLogistic.spacecraft.services.SpacecraftService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -60,12 +61,14 @@ public class SpacecraftController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'LOGISTICS_OFFICER')")
     public Mono<ResponseEntity<SpacecraftResponseDTO>> createSpacecraft(@Valid @RequestBody SpacecraftRequestDTO request) {
         return spacecraftService.createSpacecraft(request)
                 .map(response -> ResponseEntity.status(HttpStatus.CREATED).body(response));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'LOGISTICS_OFFICER')")
     public Mono<ResponseEntity<SpacecraftResponseDTO>> updateSpacecraft(
             @PathVariable Long id,
             @Valid @RequestBody SpacecraftRequestDTO request) {
@@ -81,6 +84,7 @@ public class SpacecraftController {
     }
 
     @PutMapping("/{id}/status")
+    @PreAuthorize("hasAnyRole('ADMIN', 'LOGISTICS_OFFICER')")
     public Mono<ResponseEntity<SpacecraftResponseDTO>> updateSpacecraftStatus(
             @PathVariable Long id,
             @RequestParam SpacecraftStatus status) {
