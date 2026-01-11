@@ -82,9 +82,9 @@ public class CargoStorageService {
                 .orElseThrow(() -> new CargoStorageNotFoundException("Cargo storage not found with id: " + id));
 
         StorageUnit storageUnit = storageUnitRepository.findById(cargoStorage.getStorageUnitId())
-                .orElseThrow(() -> new RuntimeException("Storage unit not found"));
+                .orElseThrow(() -> new StorageUnitNotFoundException("Storage unit not found with id: " + cargoStorage.getStorageUnitId()));
         Cargo cargo = cargoRepository.findById(cargoStorage.getCargoId())
-                .orElseThrow(() -> new RuntimeException("Cargo not found"));
+                .orElseThrow(() -> new org.orbitalLogistic.cargo.exceptions.CargoNotFoundException("Cargo not found with id: " + cargoStorage.getCargoId()));
 
         BigDecimal oldMass = cargo.getMassPerUnit().multiply(BigDecimal.valueOf(cargoStorage.getQuantity()));
         BigDecimal oldVolume = cargo.getVolumePerUnit().multiply(BigDecimal.valueOf(cargoStorage.getQuantity()));

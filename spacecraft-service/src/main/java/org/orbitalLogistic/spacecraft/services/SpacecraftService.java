@@ -186,7 +186,13 @@ public class SpacecraftService {
         if (!spacecraftRepository.existsById(id)) {
             throw new SpacecraftNotFoundException("Spacecraft not found with id: " + id);
         }
-        spacecraftRepository.deleteById(id);
+        try {
+            spacecraftRepository.deleteById(id);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            throw new org.orbitalLogistic.spacecraft.exceptions.DataNotFoundException(
+                "Cannot delete spacecraft with id: " + id + ". It is referenced by other entities (missions, maintenance logs, etc.)."
+            );
+        }
     }
 
     public Mono<List<SpacecraftResponseDTO>> getAvailableSpacecrafts() {

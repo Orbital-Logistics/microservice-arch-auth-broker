@@ -1,6 +1,7 @@
 package org.orbitalLogistic.cargo.exceptions;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -127,6 +128,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
+    @ExceptionHandler(CargoInUseException.class)
+    public ResponseEntity<ErrorResponse> handleCargoInUseException(CargoInUseException ex) {
+        log.warn("Cargo in use: {}", ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+                ex.getMessage(),
+                "Conflict",
+                HttpStatus.CONFLICT.value(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationErrorResponse> handleValidationExceptions(
@@ -225,6 +238,22 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        log.warn("Data integrity violation: {}", ex.getMessage());
+        String message = "Cannot perform operation due to data integrity constraints";
+        if (ex.getMessage() != null && ex.getMessage().contains("foreign key")) {
+            message = "Cannot delete or modify this record because it is referenced by other data";
+        }
+        ErrorResponse errorResponse = new ErrorResponse(
+                message,
+                "Conflict",
+                HttpStatus.CONFLICT.value(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleAllUncaughtException(Exception ex) {

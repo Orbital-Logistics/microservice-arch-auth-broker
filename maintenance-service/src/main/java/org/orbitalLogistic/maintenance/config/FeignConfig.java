@@ -1,44 +1,40 @@
 package org.orbitalLogistic.maintenance.config;
 
 import feign.RequestInterceptor;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Configuration
 @Slf4j
 public class FeignConfig {
     
+    private static final ThreadLocal<String> authTokenHolder = new ThreadLocal<>();
+    
     @Bean
     public RequestInterceptor bearerTokenRequestInterceptor() {
         return requestTemplate -> {
             try {
-                ServletRequestAttributes attributes = (ServletRequestAttributes) 
-                    RequestContextHolder.getRequestAttributes();
-                
-                if (attributes != null) {
-                    HttpServletRequest request = attributes.getRequest();
-                    String authHeader = request.getHeader("Authorization");
-                    
-                    if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                        requestTemplate.header("Authorization", authHeader);
-                        log.debug("JWT token forwarded to Feign request");
-                        
-                        String token = authHeader.substring(7);
-                        log.debug("Token length: {}, preview: {}...", 
-                            token.length(), token.substring(0, Math.min(30, token.length())));
-                    } else {
-                        log.warn("No Bearer token found in current request for Feign call");
-                    }
+                String token = authTokenHolder.get();
+                if (token != null && !token.isEmpty()) {
+                    requestTemplate.header("Authorization", "Bearer " + token);
+                    log.debug("JWT token forwarded to Feign request");
+                    log.debug("Token length: {}, preview: {}...", 
+                        token.length(), token.substring(0, Math.min(30, token.length())));
                 } else {
-                    log.warn("No HTTP request context found for Feign call");
+                    log.warn("No Bearer token found in ThreadLocal for Feign call");
                 }
             } catch (Exception e) {
                 log.error("Failed to forward JWT token to Feign request", e);
             }
         };
+    }
+    
+    public static void setAuthToken(String token) {
+        authTokenHolder.set(token);
+    }
+    
+    public static void clearAuthToken() {
+        authTokenHolder.remove();
     }
 }

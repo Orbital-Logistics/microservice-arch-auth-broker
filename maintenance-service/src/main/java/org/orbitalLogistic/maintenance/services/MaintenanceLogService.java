@@ -100,19 +100,19 @@ public class MaintenanceLogService {
     private Mono<MaintenanceLogResponseDTO> toResponseDTO(MaintenanceLog lg) {
         Mono<String> spacecraftName = spacecraftServiceClient.getSpacecraftById(lg.getSpacecraftId())
                 .map(SpacecraftDTO::name)
-                .switchIfEmpty(Mono.just("Unknown"))
                 .onErrorResume(ex -> {
-                    log.warn("Fallback: Unable to fetch spacecraft with id: {}", lg.getSpacecraftId());
+                    log.warn("Fallback: Unable to fetch spacecraft with id: {}, error: {}", lg.getSpacecraftId(), ex.getMessage());
                     return Mono.just("Unknown");
-                });
+                })
+                .defaultIfEmpty("Unknown");
 
         Mono<String> performedByName = userServiceClient.getUserById(lg.getPerformedByUserId())
                 .map(UserDTO::username)
-                .switchIfEmpty(Mono.just("Unknown"))
                 .onErrorResume(ex -> {
-                    log.warn("Fallback: Unable to fetch user with id: {}", lg.getPerformedByUserId());
+                    log.warn("Fallback: Unable to fetch user with id: {}, error: {}", lg.getPerformedByUserId(), ex.getMessage());
                     return Mono.just("Unknown");
-                });
+                })
+                .defaultIfEmpty("Unknown");
 
         Mono<String> supervisedByName =
                 lg.getSupervisedByUserId() == null
@@ -120,7 +120,7 @@ public class MaintenanceLogService {
                     : userServiceClient.getUserById(lg.getSupervisedByUserId())
                     .map(UserDTO::username)
                     .onErrorResume(ex -> {
-                        log.warn("Fallback: Unable to fetch user with id: {}", lg.getSupervisedByUserId());
+                        log.warn("Fallback: Unable to fetch supervised user with id: {}, error: {}", lg.getSupervisedByUserId(), ex.getMessage());
                         return Mono.just("Unknown");
                     })
                     .defaultIfEmpty("");

@@ -92,7 +92,21 @@ public class CargoService {
             throw new CargoNotFoundException("Cargo not found with id: " + id);
         }
 
-        cargoRepository.deleteById(id);
+        // Проверяем, используется ли cargo в storage
+        Integer totalQuantity = cargoStorageService.calculateTotalQuantityForCargo(id);
+        if (totalQuantity != null && totalQuantity > 0) {
+            throw new org.orbitalLogistic.cargo.exceptions.CargoInUseException(
+                "Cannot delete cargo with id: " + id + ". It is currently used in storage (quantity: " + totalQuantity + ")"
+            );
+        }
+
+        try {
+            cargoRepository.deleteById(id);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            throw new org.orbitalLogistic.cargo.exceptions.CargoInUseException(
+                "Cannot delete cargo with id: " + id + ". It is referenced by other entities."
+            );
+        }
     }
 
     public PageResponseDTO<CargoResponseDTO> searchCargos(String name, String cargoType, String hazardLevel, int page, int size) {

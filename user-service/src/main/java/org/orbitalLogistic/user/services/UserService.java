@@ -5,7 +5,6 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import org.orbitalLogistic.user.entities.User;
-import org.orbitalLogistic.user.exceptions.auth.UsernameAlreadyExistsException;
 import org.orbitalLogistic.user.exceptions.common.BadRequestException;
 import org.orbitalLogistic.user.exceptions.auth.UnknownUsernameException;
 import org.orbitalLogistic.user.repositories.UserRepository;
@@ -54,7 +53,13 @@ public class UserService {
     }
 
     public void deleteUser(Long id) {
-        userRepository.deleteById(id);
+        try {
+            userRepository.deleteById(id);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            throw new org.orbitalLogistic.user.exceptions.common.InvalidOperationException(
+                "Cannot delete user with id: " + id + ". User is referenced by other entities."
+            );
+        }
     }
 
     public Optional<User> findByUsername(String username) {

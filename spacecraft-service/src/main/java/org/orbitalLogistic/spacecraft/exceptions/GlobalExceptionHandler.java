@@ -2,6 +2,7 @@ package org.orbitalLogistic.spacecraft.exceptions;
 
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -193,6 +194,22 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public Mono<ResponseEntity<ErrorResponse>> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        log.warn("Data integrity violation: {}", ex.getMessage());
+        String message = "Cannot perform operation due to data integrity constraints";
+        if (ex.getMessage() != null && ex.getMessage().contains("foreign key")) {
+            message = "Cannot delete or modify this record because it is referenced by other data";
+        }
+        return Mono.just(ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse(
+                        LocalDateTime.now(),
+                        HttpStatus.CONFLICT.value(),
+                        "Conflict",
+                        message
+                )));
     }
 
     @ExceptionHandler(Exception.class)
