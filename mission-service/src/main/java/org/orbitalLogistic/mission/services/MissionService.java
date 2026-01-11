@@ -141,7 +141,13 @@ public class MissionService {
         if (!missionRepository.existsById(id)) {
             throw new MissionNotFoundException("Mission not found with id: " + id);
         }
-        missionRepository.deleteById(id);
+        try {
+            missionRepository.deleteById(id);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            throw new InvalidOperationException(
+                "Cannot delete mission with id: " + id + ". It is referenced by other entities (assignments, etc.)."
+            );
+        }
     }
 
     public List<MissionResponseDTO> getMissionsByCommander(Long commanderId) {

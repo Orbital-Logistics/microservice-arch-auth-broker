@@ -15,6 +15,7 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
+import reactor.util.context.Context;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 public class JwtAuthFilter implements WebFilter {
 
     private final JwtService jwtService;
+    public static final String JWT_TOKEN_KEY = "JWT_TOKEN";
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
@@ -53,7 +55,8 @@ public class JwtAuthFilter implements WebFilter {
             SecurityContext securityContext = new SecurityContextImpl(auth);
 
             return chain.filter(exchange)
-                    .contextWrite(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext)));
+                    .contextWrite(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext)))
+                    .contextWrite(Context.of(JWT_TOKEN_KEY, jwt));
         } catch (Exception e) {
             return chain.filter(exchange);
         }

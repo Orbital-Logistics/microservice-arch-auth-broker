@@ -2,7 +2,6 @@ package org.orbitalLogistic.mission.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.orbitalLogistic.mission.clients.UserDTO;
-import org.orbitalLogistic.mission.clients.UserServiceClient;
 import org.orbitalLogistic.mission.clients.resilient.ResilientUserService;
 import org.orbitalLogistic.mission.dto.common.PageResponseDTO;
 import org.orbitalLogistic.mission.dto.request.MissionAssignmentRequestDTO;
@@ -92,7 +91,13 @@ public class MissionAssignmentService {
         if (!missionAssignmentRepository.existsById(id)) {
             throw new MissionAssignmentNotFoundException("Mission assignment not found with id: " + id);
         }
-        missionAssignmentRepository.deleteById(id);
+        try {
+            missionAssignmentRepository.deleteById(id);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            throw new InvalidOperationException(
+                "Cannot delete mission assignment with id: " + id + ". It is referenced by other entities."
+            );
+        }
     }
 
     private MissionAssignmentResponseDTO toResponseDTO(MissionAssignment assignment) {
