@@ -14,6 +14,7 @@ class GlobalExceptionHandlerTest {
         InventoryTransactionNotFoundException ex = new InventoryTransactionNotFoundException("tx missing");
         ResponseEntity<GlobalExceptionHandler.ErrorResponse> resp = handler.handleInventoryTransactionNotFoundException(ex);
         assertEquals(404, resp.getStatusCodeValue());
+        assertNotNull(resp.getBody());
         assertEquals("tx missing", resp.getBody().message());
         assertEquals("Not Found", resp.getBody().error());
     }
@@ -23,6 +24,7 @@ class GlobalExceptionHandlerTest {
         CargoManifestNotFoundException ex = new CargoManifestNotFoundException("manifest missing");
         ResponseEntity<GlobalExceptionHandler.ErrorResponse> resp = handler.handleCargoManifestNotFoundException(ex);
         assertEquals(404, resp.getStatusCodeValue());
+        assertNotNull(resp.getBody());
         assertEquals("manifest missing", resp.getBody().message());
     }
 
@@ -31,6 +33,7 @@ class GlobalExceptionHandlerTest {
         InvalidOperationException ex = new InvalidOperationException("bad op");
         ResponseEntity<GlobalExceptionHandler.ErrorResponse> resp = handler.handleInvalidOperationException(ex);
         assertEquals(400, resp.getStatusCodeValue());
+        assertNotNull(resp.getBody());
         assertEquals("bad op", resp.getBody().message());
         assertEquals("Bad Request", resp.getBody().error());
     }
@@ -40,6 +43,7 @@ class GlobalExceptionHandlerTest {
         UserServiceException ex = new UserServiceException("user svc down");
         ResponseEntity<GlobalExceptionHandler.ErrorResponse> resp = handler.handleUserServiceException(ex);
         assertEquals(503, resp.getStatusCodeValue());
+        assertNotNull(resp.getBody());
         assertEquals("user svc down", resp.getBody().message());
     }
 
@@ -48,6 +52,7 @@ class GlobalExceptionHandlerTest {
         SpacecraftServiceException ex = new SpacecraftServiceException("sc svc down");
         ResponseEntity<GlobalExceptionHandler.ErrorResponse> resp = handler.handleSpacecraftServiceException(ex);
         assertEquals(503, resp.getStatusCodeValue());
+        assertNotNull(resp.getBody());
         assertEquals("sc svc down", resp.getBody().message());
     }
 
@@ -56,6 +61,7 @@ class GlobalExceptionHandlerTest {
         CargoServiceException ex = new CargoServiceException("cargo svc down");
         ResponseEntity<GlobalExceptionHandler.ErrorResponse> resp = handler.handleCargoServiceException(ex);
         assertEquals(503, resp.getStatusCodeValue());
+        assertNotNull(resp.getBody());
         assertEquals("cargo svc down", resp.getBody().message());
     }
 
@@ -64,6 +70,7 @@ class GlobalExceptionHandlerTest {
         UserServiceNotFound ex = new UserServiceNotFound("user not found");
         ResponseEntity<GlobalExceptionHandler.ErrorResponse> resp = handler.handleUserServiceNotFound(ex);
         assertEquals(404, resp.getStatusCodeValue());
+        assertNotNull(resp.getBody());
         assertEquals("user not found", resp.getBody().message());
         assertEquals("User not found", resp.getBody().error());
     }
@@ -73,6 +80,7 @@ class GlobalExceptionHandlerTest {
         Exception ex = new Exception("boom");
         ResponseEntity<GlobalExceptionHandler.ErrorResponse> resp = handler.handleAllUncaughtException(ex);
         assertEquals(500, resp.getStatusCodeValue());
+        assertNotNull(resp.getBody());
         assertEquals("An unexpected error occurred", resp.getBody().message());
     }
 }
