@@ -4,10 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.orbitalLogistic.maintenance.TestcontainersConfiguration;
-import org.orbitalLogistic.maintenance.entities.MaintenanceLog;
-import org.orbitalLogistic.maintenance.entities.enums.MaintenanceStatus;
-import org.orbitalLogistic.maintenance.entities.enums.MaintenanceType;
-import org.orbitalLogistic.maintenance.repositories.MaintenanceLogRepository;
+import org.orbitalLogistic.maintenance.infrastructure.adapters.out.persistence.MaintenanceLogEntity;
+import org.orbitalLogistic.maintenance.infrastructure.adapters.out.persistence.MaintenanceLogR2dbcRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -32,33 +30,33 @@ import static org.junit.jupiter.api.Assertions.*;
 class MaintenanceLogRepositoryTest {
 
     @Autowired
-    private MaintenanceLogRepository maintenanceLogRepository;
+    private MaintenanceLogR2dbcRepository maintenanceLogRepository;
 
-    private MaintenanceLog testLog1;
-    private MaintenanceLog testLog2;
+    private MaintenanceLogEntity testLog1;
+    private MaintenanceLogEntity testLog2;
 
     @BeforeEach
     void setUp() {
         maintenanceLogRepository.deleteAll().block();
 
-        testLog1 = MaintenanceLog.builder()
+        testLog1 = MaintenanceLogEntity.builder()
                 .spacecraftId(1L)
-                .maintenanceType(MaintenanceType.ROUTINE)
+                .maintenanceType("ROUTINE")
                 .performedByUserId(1L)
                 .supervisedByUserId(2L)
                 .startTime(LocalDateTime.now().minusDays(1))
                 .endTime(LocalDateTime.now())
-                .status(MaintenanceStatus.COMPLETED)
+                .status("COMPLETED")
                 .description("Routine maintenance check")
                 .cost(new BigDecimal("1500.00"))
                 .build();
 
-        testLog2 = MaintenanceLog.builder()
+        testLog2 = MaintenanceLogEntity.builder()
                 .spacecraftId(1L)
-                .maintenanceType(MaintenanceType.REPAIR)
+                .maintenanceType("REPAIR")
                 .performedByUserId(2L)
                 .startTime(LocalDateTime.now())
-                .status(MaintenanceStatus.IN_PROGRESS)
+                .status("IN_PROGRESS")
                 .description("Engine repair")
                 .cost(new BigDecimal("5000.00"))
                 .build();
@@ -69,12 +67,12 @@ class MaintenanceLogRepositoryTest {
 
     @Test
     void save_Success() {
-        MaintenanceLog newLog = MaintenanceLog.builder()
+        MaintenanceLogEntity newLog = MaintenanceLogEntity.builder()
                 .spacecraftId(2L)
-                .maintenanceType(MaintenanceType.INSPECTION)
+                .maintenanceType("INSPECTION")
                 .performedByUserId(1L)
                 .startTime(LocalDateTime.now())
-                .status(MaintenanceStatus.SCHEDULED)
+                .status("SCHEDULED")
                 .description("Pre-flight inspection")
                 .cost(new BigDecimal("500.00"))
                 .build();
@@ -83,8 +81,8 @@ class MaintenanceLogRepositoryTest {
                 .assertNext(saved -> {
                     assertNotNull(saved.getId());
                     assertEquals(2L, saved.getSpacecraftId());
-                    assertEquals(MaintenanceType.INSPECTION, saved.getMaintenanceType());
-                    assertEquals(MaintenanceStatus.SCHEDULED, saved.getStatus());
+                    assertEquals("INSPECTION", saved.getMaintenanceType());
+                    assertEquals("SCHEDULED", saved.getStatus());
                 })
                 .verifyComplete();
     }
@@ -157,12 +155,12 @@ class MaintenanceLogRepositoryTest {
 
     @Test
     void update_Success() {
-        testLog1.setStatus(MaintenanceStatus.IN_PROGRESS);
+        testLog1.setStatus("IN_PROGRESS");
         testLog1.setDescription("Updated description");
 
         StepVerifier.create(maintenanceLogRepository.save(testLog1))
                 .assertNext(updated -> {
-                    assertEquals(MaintenanceStatus.IN_PROGRESS, updated.getStatus());
+                    assertEquals("IN_PROGRESS", updated.getStatus());
                     assertEquals("Updated description", updated.getDescription());
                 })
                 .verifyComplete();
