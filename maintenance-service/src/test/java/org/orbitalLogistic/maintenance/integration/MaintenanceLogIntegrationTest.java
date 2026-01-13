@@ -5,12 +5,12 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.orbitalLogistic.maintenance.clients.feign.SpacecraftServiceFeignClient;
 import org.orbitalLogistic.maintenance.clients.feign.UserServiceFeignClient;
-import org.orbitalLogistic.maintenance.dto.common.SpacecraftDTO;
-import org.orbitalLogistic.maintenance.dto.common.UserDTO;
-import org.orbitalLogistic.maintenance.dto.request.MaintenanceLogRequestDTO;
-import org.orbitalLogistic.maintenance.entities.enums.MaintenanceStatus;
-import org.orbitalLogistic.maintenance.entities.enums.MaintenanceType;
-import org.orbitalLogistic.maintenance.repositories.MaintenanceLogRepository;
+import org.orbitalLogistic.maintenance.infrastructure.adapters.out.external.dto.SpacecraftDTO;
+import org.orbitalLogistic.maintenance.infrastructure.adapters.out.external.dto.UserDTO;
+import org.orbitalLogistic.maintenance.infrastructure.adapters.in.rest.dto.MaintenanceLogRequestDTO;
+import org.orbitalLogistic.maintenance.infrastructure.adapters.in.rest.dto.MaintenanceStatus;
+import org.orbitalLogistic.maintenance.infrastructure.adapters.in.rest.dto.MaintenanceType;
+import org.orbitalLogistic.maintenance.infrastructure.adapters.out.persistence.MaintenanceLogR2dbcRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -67,7 +67,7 @@ class MaintenanceLogIntegrationTest {
     private WebTestClient webTestClient;
 
     @Autowired
-    private MaintenanceLogRepository maintenanceLogRepository;
+    private MaintenanceLogR2dbcRepository maintenanceLogRepository;
 
     @MockitoBean
     private SpacecraftServiceFeignClient spacecraftServiceClient;

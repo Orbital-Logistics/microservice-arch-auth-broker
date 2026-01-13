@@ -12,3 +12,4 @@ config_server_vars.md
 *.iml
 *.bin
 *.lock
+/.gradle/

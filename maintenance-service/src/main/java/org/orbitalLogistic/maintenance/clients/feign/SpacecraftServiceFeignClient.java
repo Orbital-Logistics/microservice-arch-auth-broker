@@ -1,7 +1,7 @@
 package org.orbitalLogistic.maintenance.clients.feign;
 
 import org.orbitalLogistic.maintenance.config.FeignConfig;
-import org.orbitalLogistic.maintenance.dto.common.SpacecraftDTO;
+import org.orbitalLogistic.maintenance.infrastructure.adapters.out.external.dto.SpacecraftDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
