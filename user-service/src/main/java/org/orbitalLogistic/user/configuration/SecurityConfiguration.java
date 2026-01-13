@@ -1,8 +1,8 @@
 package org.orbitalLogistic.user.configuration;
 
 import lombok.RequiredArgsConstructor;
-import org.orbitalLogistic.user.filter.JwtAuthFilter;
-import org.orbitalLogistic.user.services.UserService;
+import org.orbitalLogistic.user.infrastructure.adapters.in.rest.security.JwtAuthFilter;
+import org.orbitalLogistic.user.infrastructure.adapters.out.security.UserDetailsServiceAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,7 +17,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.header.writers.XXssProtectionHeaderWriter;
 
 @Configuration
 @EnableWebSecurity
@@ -26,6 +25,7 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
 public class SecurityConfiguration {
 
     private final JwtAuthFilter jwtAuthFilter;
+    private final UserDetailsServiceAdapter userDetailsService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -58,9 +58,9 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(UserService userService) {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userService.userDetailsService());
-        authProvider.setPasswordEncoder(passwordEncoder());
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(passwordEncoder());
+        authProvider.setUserDetailsService(userDetailsService);
         return authProvider;
     }
 
