@@ -1,7 +1,9 @@
 package org.orbitalLogistic.spacecraft.exceptions;
 
+import com.fasterxml.jackson.databind.exc.ValueInstantiationException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.codec.DecodingException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.support.WebExchangeBindException;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 
 
@@ -155,6 +158,66 @@ public class GlobalExceptionHandler {
                 "Validation failed",
                 errors
         )));
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ServerWebInputException.class)
+    public Mono<ResponseEntity<ErrorResponse>> handleServerWebInputException(ServerWebInputException ex) {
+        log.warn("Server web input error: {}", ex.getMessage());
+
+        String message = "Invalid input data";
+        Throwable cause = ex.getCause();
+
+        if (cause instanceof DecodingException) {
+            message = extractDecodingErrorMessage(cause);
+        } else if (ex.getReason() != null) {
+            message = ex.getReason();
+        }
+
+        return Mono.just(ResponseEntity.badRequest().body(new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Bad Request",
+                message
+        )));
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(DecodingException.class)
+    public Mono<ResponseEntity<ErrorResponse>> handleDecodingException(DecodingException ex) {
+        log.warn("Decoding error: {}", ex.getMessage());
+        String message = extractDecodingErrorMessage(ex);
+
+        return Mono.just(ResponseEntity.badRequest().body(new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Bad Request",
+                message
+        )));
+    }
+
+    private String extractDecodingErrorMessage(Throwable ex) {
+        Throwable cause = ex.getCause();
+
+        if (cause instanceof ValueInstantiationException) {
+            Throwable rootCause = cause.getCause();
+            if (rootCause instanceof IllegalArgumentException) {
+                return rootCause.getMessage();
+            }
+            return cause.getMessage();
+        }
+
+        String msg = ex.getMessage();
+        if (msg != null) {
+            if (msg.contains("problem:")) {
+                int idx = msg.indexOf("problem:");
+                msg = msg.substring(idx + 8).trim();
+                if (msg.contains("\n")) {
+                    msg = msg.substring(0, msg.indexOf("\n")).trim();
+                }
+            }
+        }
+        return msg != null ? msg : "Invalid JSON format or data type";
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

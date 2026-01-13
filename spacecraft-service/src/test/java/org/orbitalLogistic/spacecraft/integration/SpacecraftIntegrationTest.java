@@ -7,13 +7,13 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.orbitalLogistic.spacecraft.TestcontainersConfiguration;
 import org.orbitalLogistic.spacecraft.config.TestSecurityConfig;
-import org.orbitalLogistic.spacecraft.dto.request.SpacecraftRequestDTO;
-import org.orbitalLogistic.spacecraft.entities.Spacecraft;
-import org.orbitalLogistic.spacecraft.entities.SpacecraftType;
-import org.orbitalLogistic.spacecraft.entities.enums.SpacecraftClassification;
-import org.orbitalLogistic.spacecraft.entities.enums.SpacecraftStatus;
-import org.orbitalLogistic.spacecraft.repositories.SpacecraftRepository;
-import org.orbitalLogistic.spacecraft.repositories.SpacecraftTypeRepository;
+import org.orbitalLogistic.spacecraft.infrastructure.adapters.in.rest.dto.SpacecraftRequestDTO;
+import org.orbitalLogistic.spacecraft.infrastructure.adapters.out.persistence.SpacecraftEntity;
+import org.orbitalLogistic.spacecraft.infrastructure.adapters.out.persistence.SpacecraftTypeEntity;
+import org.orbitalLogistic.spacecraft.domain.model.enums.SpacecraftClassification;
+import org.orbitalLogistic.spacecraft.domain.model.enums.SpacecraftStatus;
+import org.orbitalLogistic.spacecraft.infrastructure.adapters.out.persistence.SpacecraftJdbcRepository;
+import org.orbitalLogistic.spacecraft.infrastructure.adapters.out.persistence.SpacecraftTypeJdbcRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,21 +44,21 @@ class SpacecraftIntegrationTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private SpacecraftRepository spacecraftRepository;
+    private SpacecraftJdbcRepository spacecraftRepository;
 
     @Autowired
-    private SpacecraftTypeRepository spacecraftTypeRepository;
+    private SpacecraftTypeJdbcRepository spacecraftTypeRepository;
 
-    private SpacecraftType testSpacecraftType;
+    private SpacecraftTypeEntity testSpacecraftType;
 
     @BeforeEach
     void setUp() {
         spacecraftRepository.deleteAll();
         spacecraftTypeRepository.deleteAll();
 
-        testSpacecraftType = SpacecraftType.builder()
+        testSpacecraftType = SpacecraftTypeEntity.builder()
                 .typeName("Cargo Hauler")
-                .classification(SpacecraftClassification.CARGO_HAULER)
+                .classification(SpacecraftClassification.CARGO_HAULER.name())
                 .maxCrewCapacity(10)
                 .build();
         testSpacecraftType = spacecraftTypeRepository.save(testSpacecraftType);
@@ -138,13 +138,13 @@ class SpacecraftIntegrationTest {
     @Test
     @DisplayName("Создание корабля с дублирующимся регистрационным кодом возвращает ошибку")
     void createSpacecraft_DuplicateRegistryCode_ReturnsError() throws Exception {
-        Spacecraft existingSpacecraft = Spacecraft.builder()
+        SpacecraftEntity existingSpacecraft = SpacecraftEntity.builder()
                 .registryCode("SC-DUPLICATE")
                 .name("Existing Ship")
                 .spacecraftTypeId(testSpacecraftType.getId())
                 .massCapacity(new BigDecimal("5000.00"))
                 .volumeCapacity(new BigDecimal("2500.00"))
-                .status(SpacecraftStatus.DOCKED)
+                .status(SpacecraftStatus.DOCKED.name())
                 .currentLocation("Earth")
                 .build();
         spacecraftRepository.save(existingSpacecraft);
@@ -237,33 +237,33 @@ class SpacecraftIntegrationTest {
     @Test
     @DisplayName("Получение доступных кораблей")
     void getAvailableSpacecrafts() throws Exception {
-        Spacecraft available1 = Spacecraft.builder()
+        SpacecraftEntity available1 = SpacecraftEntity.builder()
                 .registryCode("SC-AVAIL-1")
                 .name("Available Ship 1")
                 .spacecraftTypeId(testSpacecraftType.getId())
                 .massCapacity(new BigDecimal("5000.00"))
                 .volumeCapacity(new BigDecimal("2500.00"))
-                .status(SpacecraftStatus.DOCKED)
+                .status(SpacecraftStatus.DOCKED.name())
                 .currentLocation("Earth")
                 .build();
 
-        Spacecraft available2 = Spacecraft.builder()
+        SpacecraftEntity available2 = SpacecraftEntity.builder()
                 .registryCode("SC-AVAIL-2")
                 .name("Available Ship 2")
                 .spacecraftTypeId(testSpacecraftType.getId())
                 .massCapacity(new BigDecimal("6000.00"))
                 .volumeCapacity(new BigDecimal("3000.00"))
-                .status(SpacecraftStatus.DOCKED)
+                .status(SpacecraftStatus.DOCKED.name())
                 .currentLocation("Mars")
                 .build();
 
-        Spacecraft inMission = Spacecraft.builder()
+        SpacecraftEntity inMission = SpacecraftEntity.builder()
                 .registryCode("SC-MISSION")
                 .name("Mission Ship")
                 .spacecraftTypeId(testSpacecraftType.getId())
                 .massCapacity(new BigDecimal("7000.00"))
                 .volumeCapacity(new BigDecimal("3500.00"))
-                .status(SpacecraftStatus.IN_TRANSIT)
+                .status(SpacecraftStatus.IN_TRANSIT.name())
                 .currentLocation("Jupiter")
                 .build();
 
@@ -283,23 +283,23 @@ class SpacecraftIntegrationTest {
     @Test
     @DisplayName("Фильтрация кораблей по имени")
     void getSpacecrafts_FilterByName() throws Exception {
-        Spacecraft spacecraft1 = Spacecraft.builder()
+        SpacecraftEntity spacecraft1 = SpacecraftEntity.builder()
                 .registryCode("SC-STAR-1")
                 .name("Star Carrier Alpha")
                 .spacecraftTypeId(testSpacecraftType.getId())
                 .massCapacity(new BigDecimal("10000.00"))
                 .volumeCapacity(new BigDecimal("5000.00"))
-                .status(SpacecraftStatus.DOCKED)
+                .status(SpacecraftStatus.DOCKED.name())
                 .currentLocation("Earth")
                 .build();
 
-        Spacecraft spacecraft2 = Spacecraft.builder()
+        SpacecraftEntity spacecraft2 = SpacecraftEntity.builder()
                 .registryCode("SC-NOVA")
                 .name("Nova Transporter")
                 .spacecraftTypeId(testSpacecraftType.getId())
                 .massCapacity(new BigDecimal("8000.00"))
                 .volumeCapacity(new BigDecimal("4000.00"))
-                .status(SpacecraftStatus.DOCKED)
+                .status(SpacecraftStatus.DOCKED.name())
                 .currentLocation("Mars")
                 .build();
 
@@ -317,23 +317,23 @@ class SpacecraftIntegrationTest {
     @Test
     @DisplayName("Фильтрация кораблей по статусу")
     void getSpacecrafts_FilterByStatus() throws Exception {
-        Spacecraft available = Spacecraft.builder()
+        SpacecraftEntity available = SpacecraftEntity.builder()
                 .registryCode("SC-AVAIL")
                 .name("Available Ship")
                 .spacecraftTypeId(testSpacecraftType.getId())
                 .massCapacity(new BigDecimal("5000.00"))
                 .volumeCapacity(new BigDecimal("2500.00"))
-                .status(SpacecraftStatus.DOCKED)
+                .status(SpacecraftStatus.DOCKED.name())
                 .currentLocation("Earth")
                 .build();
 
-        Spacecraft inMission = Spacecraft.builder()
+        SpacecraftEntity inMission = SpacecraftEntity.builder()
                 .registryCode("SC-MISSION")
                 .name("Mission Ship")
                 .spacecraftTypeId(testSpacecraftType.getId())
                 .massCapacity(new BigDecimal("6000.00"))
                 .volumeCapacity(new BigDecimal("3000.00"))
-                .status(SpacecraftStatus.IN_TRANSIT)
+                .status(SpacecraftStatus.IN_TRANSIT.name())
                 .currentLocation("Mars")
                 .build();
 

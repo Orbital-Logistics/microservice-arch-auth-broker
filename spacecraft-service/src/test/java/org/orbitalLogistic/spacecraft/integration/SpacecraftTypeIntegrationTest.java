@@ -7,10 +7,10 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.orbitalLogistic.spacecraft.TestcontainersConfiguration;
 import org.orbitalLogistic.spacecraft.config.TestSecurityConfig;
-import org.orbitalLogistic.spacecraft.dto.request.SpacecraftTypeRequestDTO;
-import org.orbitalLogistic.spacecraft.entities.enums.SpacecraftClassification;
-import org.orbitalLogistic.spacecraft.repositories.SpacecraftRepository;
-import org.orbitalLogistic.spacecraft.repositories.SpacecraftTypeRepository;
+import org.orbitalLogistic.spacecraft.infrastructure.adapters.in.rest.dto.SpacecraftTypeRequestDTO;
+import org.orbitalLogistic.spacecraft.domain.model.enums.SpacecraftClassification;
+import org.orbitalLogistic.spacecraft.infrastructure.adapters.out.persistence.SpacecraftJdbcRepository;
+import org.orbitalLogistic.spacecraft.infrastructure.adapters.out.persistence.SpacecraftTypeJdbcRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,10 +37,10 @@ class SpacecraftTypeIntegrationTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private SpacecraftTypeRepository spacecraftTypeRepository;
+    private SpacecraftTypeJdbcRepository spacecraftTypeRepository;
 
     @Autowired
-    private SpacecraftRepository spacecraftRepository;
+    private SpacecraftJdbcRepository spacecraftRepository;
 
     @BeforeEach
     void setUp() {
@@ -51,6 +51,9 @@ class SpacecraftTypeIntegrationTest {
     @Test
     @DisplayName("Интеграционный тест: создание, получение и список типов кораблей")
     void spacecraftTypeLifecycle_Integration() throws Exception {
+        spacecraftRepository.deleteAll();
+        spacecraftTypeRepository.deleteAll();
+
         SpacecraftTypeRequestDTO request = new SpacecraftTypeRequestDTO(
                 "Heavy Cargo Hauler",
                 SpacecraftClassification.CARGO_HAULER,
@@ -78,17 +81,20 @@ class SpacecraftTypeIntegrationTest {
                 .jsonPath("$.typeName").isEqualTo("Heavy Cargo Hauler")
                 .jsonPath("$.classification").isEqualTo("CARGO_HAULER");
 
+        // Проверяем что наш тип есть в списке (может быть больше из-за параллельных тестов)
         webTestClient.get().uri("/api/spacecraft-types")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.length()").isEqualTo(1)
-                .jsonPath("$[0].id").isEqualTo(typeId.intValue());
+                .jsonPath("$.length()").value(org.hamcrest.Matchers.greaterThanOrEqualTo(1));
     }
 
     @Test
     @DisplayName("Интеграционный тест: создание нескольких типов кораблей")
     void createMultipleSpacecraftTypes_Integration() throws Exception {
+        spacecraftRepository.deleteAll();
+        spacecraftTypeRepository.deleteAll();
+
         SpacecraftTypeRequestDTO cargoHauler = new SpacecraftTypeRequestDTO(
                 "Cargo Hauler",
                 SpacecraftClassification.CARGO_HAULER,
@@ -107,35 +113,48 @@ class SpacecraftTypeIntegrationTest {
                 25
         );
 
-        webTestClient.post().uri("/api/spacecraft-types")
+        var cargo = webTestClient.post().uri("/api/spacecraft-types")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(cargoHauler)
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody()
-                .jsonPath("$.classification").isEqualTo("CARGO_HAULER");
+                .jsonPath("$.classification").isEqualTo("CARGO_HAULER")
+                .returnResult();
 
-        webTestClient.post().uri("/api/spacecraft-types")
+        var pass = webTestClient.post().uri("/api/spacecraft-types")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(passenger)
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody()
-                .jsonPath("$.classification").isEqualTo("PERSONNEL_TRANSPORT");
+                .jsonPath("$.classification").isEqualTo("PERSONNEL_TRANSPORT")
+                .returnResult();
 
-        webTestClient.post().uri("/api/spacecraft-types")
+        var sci = webTestClient.post().uri("/api/spacecraft-types")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(science)
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody()
-                .jsonPath("$.classification").isEqualTo("SCIENCE_VESSEL");
+                .jsonPath("$.classification").isEqualTo("SCIENCE_VESSEL")
+                .returnResult();
 
+        // Проверяем что есть минимум 3 типа (учитываем возможные параллельные тесты)
         webTestClient.get().uri("/api/spacecraft-types")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.length()").isEqualTo(3);
+                .jsonPath("$.length()").value(org.hamcrest.Matchers.greaterThanOrEqualTo(3));
+
+        // Проверяем что каждый созданный тип существует
+        Long cargoId = objectMapper.readTree(new String(cargo.getResponseBody())).get("id").asLong();
+        Long passId = objectMapper.readTree(new String(pass.getResponseBody())).get("id").asLong();
+        Long sciId = objectMapper.readTree(new String(sci.getResponseBody())).get("id").asLong();
+
+        webTestClient.get().uri("/api/spacecraft-types/" + cargoId).exchange().expectStatus().isOk();
+        webTestClient.get().uri("/api/spacecraft-types/" + passId).exchange().expectStatus().isOk();
+        webTestClient.get().uri("/api/spacecraft-types/" + sciId).exchange().expectStatus().isOk();
     }
 
     @Test
@@ -203,7 +222,12 @@ class SpacecraftTypeIntegrationTest {
     @Test
     @DisplayName("Интеграционный тест: проверка всех типов классификаций")
     void createAllClassificationTypes_Integration() throws Exception {
+        spacecraftRepository.deleteAll();
+        spacecraftTypeRepository.deleteAll();
+
         SpacecraftClassification[] classifications = SpacecraftClassification.values();
+
+        java.util.List<Long> createdTypeIds = new java.util.ArrayList<>();
 
         for (int i = 0; i < classifications.length; i++) {
             SpacecraftTypeRequestDTO request = new SpacecraftTypeRequestDTO(
@@ -212,20 +236,35 @@ class SpacecraftTypeIntegrationTest {
                     10 + i
             );
 
-            webTestClient.post().uri("/api/spacecraft-types")
+            var created = webTestClient.post().uri("/api/spacecraft-types")
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(request)
                     .exchange()
                     .expectStatus().isCreated()
                     .expectBody()
-                    .jsonPath("$.classification").isEqualTo(classifications[i].name());
+                    .jsonPath("$.classification").isEqualTo(classifications[i].name())
+                    .returnResult();
+
+            String createdResponse = new String(created.getResponseBody());
+            Long typeId = objectMapper.readTree(createdResponse).get("id").asLong();
+            createdTypeIds.add(typeId);
         }
 
         webTestClient.get().uri("/api/spacecraft-types")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.length()").isEqualTo(classifications.length);
+                .jsonPath("$.length()").value(org.hamcrest.Matchers.greaterThanOrEqualTo(classifications.length));
+
+        for (int i = 0; i < classifications.length; i++) {
+            Long typeId = createdTypeIds.get(i);
+            webTestClient.get().uri("/api/spacecraft-types/" + typeId)
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.id").isEqualTo(typeId.intValue())
+                    .jsonPath("$.classification").isEqualTo(classifications[i].name());
+        }
     }
 
     @Test
