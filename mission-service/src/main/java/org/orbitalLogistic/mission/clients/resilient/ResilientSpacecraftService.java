@@ -2,8 +2,8 @@ package org.orbitalLogistic.mission.clients.resilient;
 
 import org.orbitalLogistic.mission.clients.SpacecraftDTO;
 import org.orbitalLogistic.mission.clients.SpacecraftServiceClient;
-import org.orbitalLogistic.mission.exceptions.SpacecraftServiceException;
-import org.orbitalLogistic.mission.exceptions.SpacecraftServiceNotFound;
+import org.orbitalLogistic.mission.domain.exception.SpacecraftServiceException;
+import org.orbitalLogistic.mission.domain.exception.SpacecraftServiceNotFound;
 import org.springframework.stereotype.Service;
 
 import feign.FeignException;

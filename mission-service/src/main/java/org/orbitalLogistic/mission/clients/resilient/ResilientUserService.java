@@ -2,8 +2,8 @@ package org.orbitalLogistic.mission.clients.resilient;
 
 import org.orbitalLogistic.mission.clients.UserDTO;
 import org.orbitalLogistic.mission.clients.UserServiceClient;
-import org.orbitalLogistic.mission.exceptions.UserServiceException;
-import org.orbitalLogistic.mission.exceptions.UserServiceNotFound;
+import org.orbitalLogistic.mission.domain.exception.UserServiceException;
+import org.orbitalLogistic.mission.domain.exception.UserServiceNotFound;
 import org.springframework.stereotype.Component;
 
 import feign.FeignException;
