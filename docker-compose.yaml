@@ -43,7 +43,9 @@ services:
       RABBITMQ_DEFAULT_VHOST: "/"
       RABBITMQ_NODENAME: "rabbit@rabbitmq1"
       RABBITMQ_USE_LONGNAME: "true"
-      RABBITMQ_PLUGINS: "[rabbitmq_management,rabbitmq_peer_discovery_classic_config,rabbitmq_quorum_queue]"
+      RABBITMQ_PLUGINS: "[rabbitmq_management,rabbitmq_quorum_queue,rabbitmq_peer_discovery_classic_config]"
+      RABBITMQ_CLUSTER_DISCOVERY: classic_config
+      RABBITMQ_CLUSTER_NODES: "rabbit@rabbitmq1,rabbit@rabbitmq2,rabbit@rabbitmq3"
     volumes:
       - rabbitmq1_data:/var/lib/rabbitmq
     networks:
@@ -68,7 +70,9 @@ services:
       RABBITMQ_DEFAULT_VHOST: "/"
       RABBITMQ_NODENAME: "rabbit@rabbitmq2"
       RABBITMQ_USE_LONGNAME: "true"
-      RABBITMQ_PLUGINS: "[rabbitmq_management,rabbitmq_quorum_queue]"
+      RABBITMQ_PLUGINS: "[rabbitmq_management,rabbitmq_quorum_queue,rabbitmq_peer_discovery_classic_config]"
+      RABBITMQ_CLUSTER_DISCOVERY: classic_config
+      RABBITMQ_CLUSTER_NODES: "rabbit@rabbitmq1,rabbit@rabbitmq2,rabbit@rabbitmq3"
     volumes:
       - rabbitmq2_data:/var/lib/rabbitmq
     networks:
@@ -76,20 +80,6 @@ services:
     depends_on:
       rabbitmq1:
         condition: service_healthy
-    command: >
-      bash -c "
-        docker-entrypoint.sh rabbitmq-server -detached &&
-        sleep 15 &&
-        until rabbitmqctl -n rabbit@rabbitmq1 ping > /dev/null 2>&1; do
-          echo 'Waiting for rabbitmq1...';
-          sleep 2;
-        done &&
-        rabbitmqctl stop_app &&
-        rabbitmqctl join_cluster rabbit@rabbitmq1 &&
-        rabbitmqctl start_app &&
-        rabbitmqctl stop &&
-        exec docker-entrypoint.sh rabbitmq-server
-      "
     healthcheck:
       test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
       interval: 10s
@@ -110,7 +100,9 @@ services:
       RABBITMQ_DEFAULT_VHOST: "/"
       RABBITMQ_NODENAME: "rabbit@rabbitmq3"
       RABBITMQ_USE_LONGNAME: "true"
-      RABBITMQ_PLUGINS: "[rabbitmq_management,rabbitmq_quorum_queue]"
+      RABBITMQ_PLUGINS: "[rabbitmq_management,rabbitmq_quorum_queue,rabbitmq_peer_discovery_classic_config]"
+      RABBITMQ_CLUSTER_DISCOVERY: classic_config
+      RABBITMQ_CLUSTER_NODES: "rabbit@rabbitmq1,rabbit@rabbitmq2,rabbit@rabbitmq3"
     volumes:
       - rabbitmq3_data:/var/lib/rabbitmq
     networks:
@@ -120,20 +112,6 @@ services:
         condition: service_healthy
       rabbitmq2:
         condition: service_healthy
-    command: >
-      bash -c "
-        docker-entrypoint.sh rabbitmq-server -detached &&
-        sleep 15 &&
-        until rabbitmqctl -n rabbit@rabbitmq1 ping > /dev/null 2>&1 && rabbitmqctl -n rabbit@rabbitmq2 ping > /dev/null 2>&1; do
-          echo 'Waiting for rabbitmq1 and rabbitmq2...';
-          sleep 2;
-        done &&
-        rabbitmqctl stop_app &&
-        rabbitmqctl join_cluster rabbit@rabbitmq1 &&
-        rabbitmqctl start_app &&
-        rabbitmqctl stop &&
-        exec docker-entrypoint.sh rabbitmq-server
-      "
     healthcheck:
       test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
       interval: 10s
