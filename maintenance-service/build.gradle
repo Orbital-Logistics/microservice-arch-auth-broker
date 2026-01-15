@@ -57,6 +57,7 @@ dependencies {
     implementation 'io.github.resilience4j:resilience4j-reactor:2.2.0'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
     implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
     runtimeOnly 'org.postgresql:r2dbc-postgresql'
     implementation 'org.springframework:spring-jdbc'
