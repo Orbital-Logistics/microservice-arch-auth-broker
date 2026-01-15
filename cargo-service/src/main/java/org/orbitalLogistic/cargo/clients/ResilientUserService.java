@@ -2,7 +2,7 @@ package org.orbitalLogistic.cargo.clients;
 
 import java.util.function.Supplier;
 
-import org.orbitalLogistic.cargo.exceptions.UserServiceException;
+import org.orbitalLogistic.cargo.domain.exception.UserServiceException;
 import org.springframework.stereotype.Component;
 
 import feign.FeignException;
@@ -31,25 +31,11 @@ public class ResilientUserService {
         } catch (CallNotPermittedException e) {
             return getUserByIdFallback(id, e);
         } catch (FeignException.NotFound e) {
-            throw new UserServiceException("User with ID " + id + " not found", e);
+            throw new UserServiceException("User with ID " + id + " not found");
         } catch (FeignException e) {
             throw new UserServiceException("User Service unavailable!");
         }
     }
-
-    // public SpacecraftCargoUsageDTO getSpacecraftCargoUsageFallback(Long spacecraftId, Throwable e) {
-    //     log.error("FALLBACK getCargoById! status: {}, error: {}", spacecraftId, e.getClass().getSimpleName());
-    //     throw new SpacecraftCargoUsageException("Cargo Service unavailable!");
-    // }
-
-    // // @CircuitBreaker(name = "userService", fallbackMethod = "getUserByIdFallback")
-    // public String getUserById(Long id) {
-    //     try {
-    //         return userServiceApi.getUserById(id);
-    //     } catch (FeignException.NotFound e) {
-    //         throw new UserNotFoundException("User with ID " + id + " not found");
-    //     }
-    // }
 
     public String getUserByIdFallback(Long id, Throwable t) {
         log.error("FALLBACK getUsernameById! status: {}, error: {}", id, t.getClass().getSimpleName());
@@ -70,7 +56,7 @@ public class ResilientUserService {
         } catch (CallNotPermittedException e) {
             return userExistsFallback(id, e);
         } catch (FeignException.NotFound e) {
-            throw new UserServiceException("User with ID " + id + " not found", e);
+            throw new UserServiceException("User with ID " + id + " not found");
         } catch (FeignException e) {
             throw new UserServiceException("User Service unavailable!");
         }
@@ -79,7 +65,7 @@ public class ResilientUserService {
     public Boolean userExistsFallback(Long id, Throwable t) {
         log.error("FALLBACK userExists! userId: {}, error: {}", id, t.getClass().getSimpleName());
         if (!(t instanceof UserServiceException && t.getMessage().contains("not found"))) {
-            throw new UserServiceException("User service unavailable", t);
+            throw new UserServiceException("User service unavailable");
         }
         throw (UserServiceException) t;
     }
