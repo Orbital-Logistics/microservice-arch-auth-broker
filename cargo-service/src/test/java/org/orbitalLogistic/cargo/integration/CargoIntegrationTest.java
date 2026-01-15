@@ -5,13 +5,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.orbitalLogistic.cargo.TestcontainersConfiguration;
-import org.orbitalLogistic.cargo.dto.request.CargoRequestDTO;
-import org.orbitalLogistic.cargo.entities.Cargo;
-import org.orbitalLogistic.cargo.entities.CargoCategory;
-import org.orbitalLogistic.cargo.entities.enums.CargoType;
-import org.orbitalLogistic.cargo.entities.enums.HazardLevel;
-import org.orbitalLogistic.cargo.repositories.CargoCategoryRepository;
-import org.orbitalLogistic.cargo.repositories.CargoRepository;
+import org.orbitalLogistic.cargo.application.ports.out.CargoCategoryRepository;
+import org.orbitalLogistic.cargo.application.ports.out.CargoRepository;
+import org.orbitalLogistic.cargo.domain.model.Cargo;
+import org.orbitalLogistic.cargo.domain.model.CargoCategory;
+import org.orbitalLogistic.cargo.domain.model.enums.CargoType;
+import org.orbitalLogistic.cargo.domain.model.enums.HazardLevel;
+import org.orbitalLogistic.cargo.infrastructure.adapters.in.rest.dto.request.CreateCargoRequest;
+import org.orbitalLogistic.cargo.infrastructure.adapters.in.rest.dto.request.UpdateCargoRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -64,14 +65,14 @@ class CargoIntegrationTest {
 
     @Test
     void cargoLifecycle_Integration() throws Exception {
-        CargoRequestDTO createRequest = new CargoRequestDTO(
-                "Integration Test Cargo",
-                testCategory.getId(),
-                new BigDecimal("1.00"),
-                new BigDecimal("0.05"),
-                CargoType.EQUIPMENT,
-                HazardLevel.NONE
-        );
+        CreateCargoRequest createRequest = CreateCargoRequest.builder()
+                .name("Integration Test Cargo")
+                .cargoCategoryId(testCategory.getId())
+                .massPerUnit(BigDecimal.valueOf(1.00))
+                .volumePerUnit(BigDecimal.valueOf(0.05))
+                .cargoType(CargoType.EQUIPMENT)
+                .hazardLevel(HazardLevel.NONE)
+                .build();
 
         String createResponse = mockMvc.perform(post("/api/cargos")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -87,14 +88,14 @@ class CargoIntegrationTest {
                 .andExpect(jsonPath("$.id").value(cargoId))
                 .andExpect(jsonPath("$.name").value("Integration Test Cargo"));
 
-        CargoRequestDTO updateRequest = new CargoRequestDTO(
-                "Updated Integration Test Cargo",
-                testCategory.getId(),
-                new BigDecimal("1.50"),
-                new BigDecimal("0.06"),
-                CargoType.EQUIPMENT,
-                HazardLevel.LOW
-        );
+        UpdateCargoRequest updateRequest = UpdateCargoRequest.builder()
+                .name("Updated Integration Test Cargo")
+                .cargoCategoryId(testCategory.getId())
+                .massPerUnit(BigDecimal.valueOf(1.50))
+                .volumePerUnit(BigDecimal.valueOf(0.06))
+                .cargoType(CargoType.EQUIPMENT)
+                .hazardLevel(HazardLevel.LOW)
+                .build();
 
         mockMvc.perform(put("/api/cargos/{id}", cargoId)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -114,34 +115,32 @@ class CargoIntegrationTest {
         Cargo cargo1 = cargoRepository.save(Cargo.builder()
                 .name("Search Test Cargo 1")
                 .cargoCategoryId(testCategory.getId())
-                .massPerUnit(new BigDecimal("1.00"))
-                .volumePerUnit(new BigDecimal("0.05"))
+                .massPerUnit(BigDecimal.valueOf(1.00))
+                .volumePerUnit(BigDecimal.valueOf(0.05))
                 .cargoType(CargoType.EQUIPMENT)
                 .hazardLevel(HazardLevel.NONE)
+                .isActive(true)
                 .build());
 
         Cargo cargo2 = cargoRepository.save(Cargo.builder()
                 .name("Search Test Cargo 2")
                 .cargoCategoryId(testCategory.getId())
-                .massPerUnit(new BigDecimal("2.00"))
-                .volumePerUnit(new BigDecimal("0.10"))
+                .massPerUnit(BigDecimal.valueOf(2.00))
+                .volumePerUnit(BigDecimal.valueOf(0.10))
                 .cargoType(CargoType.FOOD)
                 .hazardLevel(HazardLevel.LOW)
+                .isActive(true)
                 .build());
 
         mockMvc.perform(get("/api/cargos/search")
-                        .param("name", "Search Test")
-                        .param("page", "0")
-                        .param("size", "20"))
+                        .param("name", "Search Test"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.length()").value(2));
+                .andExpect(jsonPath("$.length()").value(2));
 
         mockMvc.perform(get("/api/cargos/search")
-                        .param("cargoType", "EQUIPMENT")
-                        .param("page", "0")
-                        .param("size", "20"))
+                        .param("cargoType", "EQUIPMENT"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[?(@.id == " + cargo1.getId() + ")].name").value("Search Test Cargo 1"));
+                .andExpect(jsonPath("$[0].name").value("Search Test Cargo 1"));
     }
 
     @Test
@@ -149,20 +148,21 @@ class CargoIntegrationTest {
         cargoRepository.save(Cargo.builder()
                 .name("Duplicate Cargo")
                 .cargoCategoryId(testCategory.getId())
-                .massPerUnit(new BigDecimal("1.00"))
-                .volumePerUnit(new BigDecimal("0.05"))
+                .massPerUnit(BigDecimal.valueOf(1.00))
+                .volumePerUnit(BigDecimal.valueOf(0.05))
                 .cargoType(CargoType.EQUIPMENT)
                 .hazardLevel(HazardLevel.NONE)
+                .isActive(true)
                 .build());
 
-        CargoRequestDTO duplicateRequest = new CargoRequestDTO(
-                "Duplicate Cargo",
-                testCategory.getId(),
-                new BigDecimal("1.00"),
-                new BigDecimal("0.05"),
-                CargoType.EQUIPMENT,
-                HazardLevel.NONE
-        );
+        CreateCargoRequest duplicateRequest = CreateCargoRequest.builder()
+                .name("Duplicate Cargo")
+                .cargoCategoryId(testCategory.getId())
+                .massPerUnit(BigDecimal.valueOf(1.00))
+                .volumePerUnit(BigDecimal.valueOf(0.05))
+                .cargoType(CargoType.EQUIPMENT)
+                .hazardLevel(HazardLevel.NONE)
+                .build();
 
         mockMvc.perform(post("/api/cargos")
                         .contentType(MediaType.APPLICATION_JSON)
