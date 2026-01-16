@@ -3,7 +3,6 @@ package org.orbitalLogistic.inventory.adapters.config;
 import org.orbitalLogistic.inventory.adapters.minio.MinioOperations;
 import org.orbitalLogistic.inventory.adapters.reports.PdfReportGeneratorImpl;
 import org.orbitalLogistic.inventory.application.usecase.*;
-import org.scoooting.files.application.usecase.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

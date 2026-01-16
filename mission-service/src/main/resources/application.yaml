@@ -14,8 +14,8 @@ spring:
         max-attempts: 20
         initial-interval: 3000
 
-spring:
   kafka:
+    group-id: mission-service
     bootstrap-servers: ${KAFKA_URL:kafka:9092}
     consumer:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
