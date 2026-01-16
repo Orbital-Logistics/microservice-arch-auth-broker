@@ -1,8 +1,9 @@
 .idea
 .env
 */build
-*/.gradle
+**/.gradle
 
+.gradle
 gradle
 build
 
