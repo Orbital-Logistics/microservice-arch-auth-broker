@@ -20,7 +20,7 @@ import java.util.Map;
 @Component
 public class JwtService {
 
-    @Value("${jwt.secret}")
+    @Value("${jwt.secret-key}")
     private String jwtSecret;
 
     public String getUsernameFromToken(String token) {
