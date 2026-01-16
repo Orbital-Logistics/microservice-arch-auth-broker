@@ -307,12 +307,12 @@ services:
     ports:
       - 8080:8080
     depends_on:
-      - user-service
-      - spacecraft-service
-      - cargo-service
-      - mission-service
-      - maintenance-service
-      - inventory-service
+      - eureka-server
+      - config-server
+#      - cargo-service
+#      - mission-service
+#      - maintenance-service
+#      - inventory-service
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
       interval: 10s
