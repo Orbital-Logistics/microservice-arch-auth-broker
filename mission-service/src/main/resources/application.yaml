@@ -31,3 +31,4 @@ spring:
         spring.json.add.type.headers: false
 
 
+        max-interval: 10000
