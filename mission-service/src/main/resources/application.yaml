@@ -15,6 +15,7 @@ spring:
         initial-interval: 3000
 
   kafka:
+    group-id: mission-service
     bootstrap-servers: ${KAFKA_URL:kafka:9092}
     consumer:
       group-id: file-service
@@ -30,3 +31,4 @@ spring:
         spring.json.add.type.headers: false
 
 
+        max-interval: 10000

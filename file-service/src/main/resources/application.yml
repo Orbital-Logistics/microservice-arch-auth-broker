@@ -11,6 +11,7 @@ spring:
       max-file-size: 10MB
 
   kafka:
+    group-id: file-service
     bootstrap-servers: ${KAFKA_URL:kafka:9092}
     consumer:
       group-id: file-service
