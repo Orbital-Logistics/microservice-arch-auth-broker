@@ -1,4 +1,4 @@
-mc alias set minio http://minio:9000 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD
+mc alias set minio http://minio:9000 minio minio123
 
 mc mb minio/user-files/reports
 mc mb minio/default

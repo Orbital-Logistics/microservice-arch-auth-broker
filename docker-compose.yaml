@@ -487,3 +487,5 @@ volumes:
 networks:
   global:
     driver: bridge
+  minio-data:
+  kafka-1-data:
