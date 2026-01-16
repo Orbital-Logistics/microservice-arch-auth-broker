@@ -1,11 +1,29 @@
 spring:
+  application:
+    name: file-service
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URI:http://config-server:8888}
+  cloud:
+    config:
+      fail-fast: false
   servlet:
     multipart:
       max-file-size: 10MB
 
   kafka:
+    bootstrap-servers: ${KAFKA_URL:kafka:9092}
     consumer:
       group-id: file-service
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.value.default.type: java.util.HashMap
+        spring.json.trusted.packages: "*"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
 
 minio:
   url: ${MINIO_URL:http://minio:9000}
@@ -21,3 +39,6 @@ minio:
 
 server:
   port: 8084
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY:yourSuperSecretKeyAtLeast256BitsLongForProductionChangeThis}
