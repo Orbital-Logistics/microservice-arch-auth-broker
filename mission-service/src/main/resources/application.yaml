@@ -18,6 +18,7 @@ spring:
     group-id: mission-service
     bootstrap-servers: ${KAFKA_URL:kafka:9092}
     consumer:
+      group-id: file-service
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
