@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.orbitalLogistic.mission.application.ports.in.CreateMissionCommand;
 import org.orbitalLogistic.mission.application.ports.in.CreateMissionUseCase;
 import org.orbitalLogistic.mission.application.ports.out.MissionRepository;
+import org.orbitalLogistic.mission.application.ports.out.ReportSender;
 import org.orbitalLogistic.mission.application.ports.out.SpacecraftServicePort;
 import org.orbitalLogistic.mission.application.ports.out.UserServicePort;
 import org.orbitalLogistic.mission.domain.exception.MissionAlreadyExistsException;
@@ -23,6 +24,7 @@ public class CreateMissionService implements CreateMissionUseCase {
     private final MissionRepository missionRepository;
     private final UserServicePort userServicePort;
     private final SpacecraftServicePort spacecraftServicePort;
+    private final ReportSender reportSender;
 
     @Override
     @Transactional
@@ -54,6 +56,7 @@ public class CreateMissionService implements CreateMissionUseCase {
                 .build();
 
         Mission saved = missionRepository.save(mission);
+        reportSender.send(command);
         log.info("Mission created with id: {}", saved.getId());
         return saved;
     }
