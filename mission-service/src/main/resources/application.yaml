@@ -9,10 +9,6 @@ spring:
   cloud:
     config:
       fail-fast: true
-      allow-override: true
-      retry:
-        max-attempts: 20
-        initial-interval: 3000
 
   kafka:
     group-id: mission-service

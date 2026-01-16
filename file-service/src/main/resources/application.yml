@@ -5,7 +5,7 @@ spring:
     import: optional:configserver:${CONFIG_SERVER_URI:http://config-server:8888}
   cloud:
     config:
-      fail-fast: false
+      fail-fast: true
   servlet:
     multipart:
       max-file-size: 10MB
@@ -34,12 +34,12 @@ minio:
     default: default
     user-files: user-files
   formats:
-    transport-photos: transport-photos/%d/%s.jpeg
     reports: reports/%d/%s.pdf
   date-format: yyyy-MM-dd_HH-mm-ss
 
 server:
-  port: 8084
+  port: 0
 
 jwt:
-  secret-key: ${JWT_SECRET_KEY:yourSuperSecretKeyAtLeast256BitsLongForProductionChangeThis}
+  secret-key: "fbuVwHzCoJrhyC0UvnMeq8B6GXQ36uaqWKrb8a7Ch0Y"
+  expiration: 900
