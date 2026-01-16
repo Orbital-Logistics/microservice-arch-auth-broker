@@ -1,4 +1,4 @@
-package org.orbitalLogistic.user.config;
+package org.orbitalLogistic.user.configuration;
 
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
@@ -21,7 +21,7 @@ import java.util.Map;
 @Configuration
 public class RabbitMQConfig {
 
-    @Value("${spring.rabbitmq.host:rabbitmq1}")
+    @Value("${spring.rabbitmq.host:haproxy}")
     private String host;
 
     @Value("${spring.rabbitmq.port:5672}")
@@ -35,9 +35,6 @@ public class RabbitMQConfig {
 
     // TODO: Replace with actual queue name
     public static final String QUEUE_NAME = "user-service-queue";
-
-    // TODO: Replace with actual exchange name
-    public static final String EXCHANGE_NAME = "user-service-exchange";
 
     @Bean
     public ConnectionFactory connectionFactory() {
@@ -71,7 +68,6 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue queue() {
-        // Quorum queue configuration
         Map<String, Object> args = new HashMap<>();
         args.put("x-queue-type", "quorum");
         return new Queue(QUEUE_NAME, true, false, false, args);

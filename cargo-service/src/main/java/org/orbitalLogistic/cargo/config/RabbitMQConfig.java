@@ -1,9 +1,6 @@
 package org.orbitalLogistic.cargo.config;
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -24,7 +21,7 @@ import java.util.Map;
 @Configuration
 public class RabbitMQConfig {
 
-    @Value("${spring.rabbitmq.host:rabbitmq1}")
+    @Value("${spring.rabbitmq.host:haproxy}")
     private String host;
 
     @Value("${spring.rabbitmq.port:5672}")
@@ -36,9 +33,6 @@ public class RabbitMQConfig {
     @Value("${spring.rabbitmq.password:admin}")
     private String password;
 
-    // Global Topic Exchange (same as in producer-service)
-    public static final String TOPIC_EXCHANGE_NAME = "events-exchange";
-
     // Queue name for this service
     public static final String QUEUE_NAME = "cargo-service-queue";
 
@@ -48,8 +42,6 @@ public class RabbitMQConfig {
     public static final String ROUTING_KEY_MISSION_UPDATED = "mission.updated";
     public static final String ROUTING_KEY_CARGO_CREATED = "cargo.created";
     public static final String ROUTING_KEY_CARGO_UPDATED = "cargo.updated";
-    // Add more routing keys as needed, e.g.:
-    // public static final String ROUTING_KEY_USER_CREATED = "user.created";
 
     @Bean
     public ConnectionFactory connectionFactory() {
@@ -89,48 +81,6 @@ public class RabbitMQConfig {
         Map<String, Object> args = new HashMap<>();
         args.put("x-queue-type", "quorum");
         return new Queue(QUEUE_NAME, true, false, false, args);
-    }
-
-    /**
-     * Creates Topic Exchange (same as in producer-service).
-     * If exchange already exists, this will use it.
-     */
-    @Bean
-    public TopicExchange topicExchange() {
-        return new TopicExchange(TOPIC_EXCHANGE_NAME, true, false);
-    }
-
-    /**
-     * Binds queue to exchange with routing keys.
-     * This service will receive messages with matching routing keys.
-     * TODO: Add/remove bindings based on what events this service needs to handle
-     */
-    @Bean
-    public Binding bindingMissionCreated(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue)
-                .to(exchange)
-                .with(ROUTING_KEY_MISSION_CREATED);
-    }
-
-    @Bean
-    public Binding bindingMissionUpdated(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue)
-                .to(exchange)
-                .with(ROUTING_KEY_MISSION_UPDATED);
-    }
-
-    @Bean
-    public Binding bindingCargoCreated(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue)
-                .to(exchange)
-                .with(ROUTING_KEY_CARGO_CREATED);
-    }
-
-    @Bean
-    public Binding bindingCargoUpdated(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue)
-                .to(exchange)
-                .with(ROUTING_KEY_CARGO_UPDATED);
     }
 }
 

@@ -13,11 +13,7 @@ spring:
       retry:
         max-attempts: 20
         initial-interval: 3000
-  rabbitmq:
-    host: ${RABBITMQ_HOST:rabbitmq1}
-    port: ${RABBITMQ_PORT:5672}
-    username: ${RABBITMQ_USERNAME:admin}
-    password: ${RABBITMQ_PASSWORD:admin}
+        max-interval: 10000
 
 eureka:
   client:

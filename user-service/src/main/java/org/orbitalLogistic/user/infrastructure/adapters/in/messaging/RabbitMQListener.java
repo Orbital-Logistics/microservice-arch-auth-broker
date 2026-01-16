@@ -2,7 +2,7 @@ package org.orbitalLogistic.user.infrastructure.adapters.in.messaging;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.orbitalLogistic.user.config.RabbitMQConfig;
+import org.orbitalLogistic.user.configuration.RabbitMQConfig;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 

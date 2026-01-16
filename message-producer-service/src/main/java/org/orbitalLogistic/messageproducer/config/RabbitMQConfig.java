@@ -1,6 +1,7 @@
 package org.orbitalLogistic.messageproducer.config;
 
-import org.springframework.amqp.core.TopicExchange;
+import com.rabbitmq.client.AMQP;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -14,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-    @Value("${spring.rabbitmq.host:rabbitmq1}")
+    @Value("${spring.rabbitmq.host:haproxy}")
     private String host;
 
     @Value("${spring.rabbitmq.port:5672}")
@@ -26,10 +27,10 @@ public class RabbitMQConfig {
     @Value("${spring.rabbitmq.password:admin}")
     private String password;
 
-    public static final String TOPIC_EXCHANGE_NAME = "events-exchange";
+    public static final String TOPIC_EXCHANGE_NAME = "global-exchange";
 
-    // Example routing keys (event names) - можно добавлять новые
-    // Формат: <service>.<action> или <domain>.<event>
+    // Routing keys
+    // Format: <domain>.<event>
     public static final String ROUTING_KEY_MISSION_CREATED = "mission.created";
     public static final String ROUTING_KEY_MISSION_UPDATED = "mission.updated";
     public static final String ROUTING_KEY_CARGO_CREATED = "cargo.created";
@@ -71,13 +72,26 @@ public class RabbitMQConfig {
         return factory;
     }
 
-    /**
-     * Creates Topic Exchange for pub/sub pattern.
-     * Services subscribe to routing keys (event names) they are interested in.
-     */
     @Bean
     public TopicExchange topicExchange() {
         return new TopicExchange(TOPIC_EXCHANGE_NAME, true, false);
     }
-}
 
+    @Bean
+    public Queue globalQueue() {
+        return QueueBuilder.durable("global-queue")
+                .quorum()
+                .build();
+    }
+
+    // ADD MORE QUEUES FOR DIFFERENT EVENTS AND LISTENERS
+
+    @Bean
+    public Binding bindingMissionCreated(Queue globalQueue, TopicExchange topicExchange) {
+        return BindingBuilder.bind(globalQueue)
+                .to(topicExchange)
+                .with("YOUR_ROUTING_KEY");
+    }
+
+    // BIND NEW QUEUES LIKE PREVIOUS EXAMPLE
+}

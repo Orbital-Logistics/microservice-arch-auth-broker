@@ -24,7 +24,7 @@ import java.util.Map;
 @Configuration
 public class RabbitMQConfig {
 
-    @Value("${spring.rabbitmq.host:rabbitmq1}")
+    @Value("${spring.rabbitmq.host:haproxy}")
     private String host;
 
     @Value("${spring.rabbitmq.port:5672}")
@@ -36,13 +36,9 @@ public class RabbitMQConfig {
     @Value("${spring.rabbitmq.password:admin}")
     private String password;
 
-    // Global Topic Exchange (same as in producer-service)
-    public static final String TOPIC_EXCHANGE_NAME = "events-exchange";
-
     // Queue name for this service
     public static final String QUEUE_NAME = "inventory-service-queue";
 
-    // Routing keys (event names) this service is interested in
     // TODO: Add/remove routing keys based on what events inventory-service needs to handle
     public static final String ROUTING_KEY_CARGO_CREATED = "cargo.created";
     public static final String ROUTING_KEY_CARGO_UPDATED = "cargo.updated";
@@ -85,36 +81,6 @@ public class RabbitMQConfig {
         Map<String, Object> args = new HashMap<>();
         args.put("x-queue-type", "quorum");
         return new Queue(QUEUE_NAME, true, false, false, args);
-    }
-
-    @Bean
-    public TopicExchange topicExchange() {
-        return new TopicExchange(TOPIC_EXCHANGE_NAME, true, false);
-    }
-
-    @Bean
-    public Binding bindingCargoCreated(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(ROUTING_KEY_CARGO_CREATED);
-    }
-
-    @Bean
-    public Binding bindingCargoUpdated(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(ROUTING_KEY_CARGO_UPDATED);
-    }
-
-    @Bean
-    public Binding bindingMissionCreated(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(ROUTING_KEY_MISSION_CREATED);
-    }
-
-    @Bean
-    public Binding bindingMissionUpdated(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(ROUTING_KEY_MISSION_UPDATED);
-    }
-
-    @Bean
-    public Binding bindingInventoryTransaction(Queue queue, TopicExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(ROUTING_KEY_INVENTORY_TRANSACTION);
     }
 }
 
