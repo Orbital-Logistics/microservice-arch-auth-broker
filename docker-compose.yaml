@@ -326,3 +326,5 @@ volumes:
   mission_service_data:
   maintenance_service_data:
   inventory_service_data:
+  kafka-1-data:
+  minio-data:
