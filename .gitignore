@@ -14,3 +14,6 @@ config_server_vars.md
 *.bin
 *.lock
 /.gradle/
+
+**/application-dev.yaml
+**/application-dev.yml

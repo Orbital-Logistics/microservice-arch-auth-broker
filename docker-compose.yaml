@@ -121,7 +121,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
   user-service:
     build: ./user-service
     container_name: user-service
@@ -188,7 +187,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
   cargo-service:
     build: ./cargo-service
     container_name: cargo-service
@@ -222,7 +220,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
   mission-service:
     build: ./mission-service
     container_name: mission-service
@@ -256,7 +253,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
   maintenance-service:
     build: ./maintenance-service
     container_name: maintenance-service

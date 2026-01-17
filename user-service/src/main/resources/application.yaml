@@ -9,3 +9,6 @@ spring:
   cloud:
     config:
       fail-fast: false
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/user_service_db

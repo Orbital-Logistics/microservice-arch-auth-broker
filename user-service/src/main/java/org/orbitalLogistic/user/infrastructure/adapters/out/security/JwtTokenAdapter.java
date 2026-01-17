@@ -37,6 +37,7 @@ public class JwtTokenAdapter implements JwtTokenPort {
                         .map(Role::getName)
                         .collect(Collectors.toList())
                 )
+                .claim("userId", user.getId())
                 .expiration(Date.from(now.plus(Duration.ofSeconds(expiration))))
                 .signWith(getSigningKey())
                 .compact();

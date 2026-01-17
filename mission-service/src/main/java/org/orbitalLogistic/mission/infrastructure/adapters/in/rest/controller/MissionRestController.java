@@ -97,10 +97,7 @@ public class MissionRestController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'MISSION_COMMANDER')")
-    public ResponseEntity<MissionResponseDTO> createMission(
-            @Valid @RequestBody MissionRequestDTO request,
-            HttpServletRequest request_http) {
-
+    public ResponseEntity<MissionResponseDTO> createMission(@Valid @RequestBody MissionRequestDTO request) {
         CreateMissionCommand command = new CreateMissionCommand(
                 request.missionCode(),
                 request.missionName(),
