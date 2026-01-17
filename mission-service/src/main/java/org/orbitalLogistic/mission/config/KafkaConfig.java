@@ -55,7 +55,7 @@ public class KafkaConfig {
 
     @Bean
     public NewTopic createReportsDataTopic() {
-        return new NewTopic("reports-data", 1, (short) 1);
+        return new NewTopic("reports-data", 3, (short) 3);
     }
 
 }
