@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.orbitalLogistic.mission.TestcontainersConfiguration;
 import org.orbitalLogistic.mission.clients.resilient.ResilientUserService;
 import org.orbitalLogistic.mission.infrastructure.adapters.in.rest.dto.request.MissionAssignmentRequestDTO;
+import org.orbitalLogistic.mission.infrastructure.adapters.out.kafka.ReportPublisher;
 import org.orbitalLogistic.mission.domain.model.Mission;
 import org.orbitalLogistic.mission.domain.model.enums.AssignmentRole;
 import org.orbitalLogistic.mission.domain.model.enums.MissionPriority;
@@ -40,7 +41,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Tag("integration-tests")
 @TestPropertySource(properties = {
-        "spring.cloud.config.enabled=false"
+        "spring.cloud.config.enabled=false",
+        "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration"
 })
 @WithMockUser(roles = "ADMIN")
 class MissionAssignmentIntegrationTest {
@@ -59,6 +61,9 @@ class MissionAssignmentIntegrationTest {
 
     @MockitoBean
     private ResilientUserService userServiceClient;
+
+    @MockitoBean
+    private ReportPublisher reportPublisher;
 
     private Mission testMission;
 
