@@ -3,10 +3,7 @@ package org.orbitalLogistic.cargo.application.usecases;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.orbitalLogistic.cargo.application.ports.in.CreateCargoStorageUseCase;
-import org.orbitalLogistic.cargo.application.ports.out.CargoRepository;
-import org.orbitalLogistic.cargo.application.ports.out.CargoStorageRepository;
-import org.orbitalLogistic.cargo.application.ports.out.StorageUnitRepository;
-import org.orbitalLogistic.cargo.application.ports.out.UserServicePort;
+import org.orbitalLogistic.cargo.application.ports.out.*;
 import org.orbitalLogistic.cargo.domain.exception.*;
 import org.orbitalLogistic.cargo.domain.model.Cargo;
 import org.orbitalLogistic.cargo.domain.model.CargoStorage;
@@ -25,6 +22,7 @@ public class CreateCargoStorageService implements CreateCargoStorageUseCase {
     private final CargoRepository cargoRepository;
     private final StorageUnitRepository storageUnitRepository;
     private final UserServicePort userServicePort;
+    private final ReportSender reportSender;
 
     @Override
     @Transactional
@@ -68,6 +66,8 @@ public class CreateCargoStorageService implements CreateCargoStorageUseCase {
 
         CargoStorage saved = cargoStorageRepository.save(storage);
         log.info("Cargo storage created with id: {}", saved.getId());
+        reportSender.send(storage);
+
         return saved;
     }
 }

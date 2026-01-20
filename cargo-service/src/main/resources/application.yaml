@@ -14,3 +14,6 @@ spring:
         max-attempts: 20
         initial-interval: 3000
         max-interval: 10000
+  kafka:
+    consumer:
+      group-id: cargo-service

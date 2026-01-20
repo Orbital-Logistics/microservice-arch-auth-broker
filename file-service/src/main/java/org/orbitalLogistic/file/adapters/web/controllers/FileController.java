@@ -32,7 +32,7 @@ public class FileController {
     private final GetReportsUserUseCase getReportsUserUseCase;
     private final StorageOperationsUseCase storageOperationsUseCase;
 
-    @Value("${minio.formats.reports}")
+    @Value("${minio.formats.mission-reports}")
     private String reportsFormat;
 
     // ==================== USER OPERATIONS ====================

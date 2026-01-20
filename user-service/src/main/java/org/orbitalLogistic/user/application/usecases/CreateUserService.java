@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.orbitalLogistic.user.application.ports.in.CreateUserCommand;
 import org.orbitalLogistic.user.application.ports.in.CreateUserUseCase;
 import org.orbitalLogistic.user.application.ports.out.PasswordEncoderPort;
+import org.orbitalLogistic.user.application.ports.out.ReportSender;
 import org.orbitalLogistic.user.application.ports.out.RoleRepository;
 import org.orbitalLogistic.user.application.ports.out.UserRepository;
 import org.orbitalLogistic.user.domain.exception.EmailAlreadyExistsException;
@@ -12,6 +13,7 @@ import org.orbitalLogistic.user.domain.exception.RoleNotFoundException;
 import org.orbitalLogistic.user.domain.exception.UserAlreadyExistsException;
 import org.orbitalLogistic.user.domain.model.Role;
 import org.orbitalLogistic.user.domain.model.User;
+import org.orbitalLogistic.user.infrastructure.adapters.out.kafka.ReportPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,7 @@ public class CreateUserService implements CreateUserUseCase {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoderPort passwordEncoder;
+    private final ReportSender reportSender;
 
     @Override
     @Transactional

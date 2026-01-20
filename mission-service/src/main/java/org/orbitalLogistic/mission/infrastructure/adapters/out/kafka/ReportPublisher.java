@@ -14,6 +14,6 @@ public class ReportPublisher implements ReportSender {
 
     @Override
     public void send(CreateMissionCommand rental) {
-        kafkaTemplate.send("reports-data", rental);
+        kafkaTemplate.send("mission-reports-data", rental);
     }
 }
