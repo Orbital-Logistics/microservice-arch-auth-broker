@@ -5,10 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.orbitalLogistic.user.application.ports.in.AuthUseCase;
 import org.orbitalLogistic.user.application.ports.in.LoginCommand;
 import org.orbitalLogistic.user.application.ports.in.RegisterCommand;
-import org.orbitalLogistic.user.application.ports.out.JwtTokenPort;
-import org.orbitalLogistic.user.application.ports.out.PasswordEncoderPort;
-import org.orbitalLogistic.user.application.ports.out.RoleRepository;
-import org.orbitalLogistic.user.application.ports.out.UserRepository;
+import org.orbitalLogistic.user.application.ports.out.*;
 import org.orbitalLogistic.user.domain.exception.EmailAlreadyExistsException;
 import org.orbitalLogistic.user.domain.exception.InvalidCredentialsException;
 import org.orbitalLogistic.user.domain.exception.RoleNotFoundException;
@@ -30,6 +27,7 @@ public class AuthService implements AuthUseCase {
     private final RoleRepository roleRepository;
     private final PasswordEncoderPort passwordEncoder;
     private final JwtTokenPort jwtTokenPort;
+    private final ReportSender reportSender;
 
     @Override
     @Transactional(readOnly = true)
@@ -101,6 +99,7 @@ public class AuthService implements AuthUseCase {
 
         // Генерируем JWT токен
         String token = jwtTokenPort.generateToken(savedUser);
+        reportSender.send(command);
 
         return token;
     }

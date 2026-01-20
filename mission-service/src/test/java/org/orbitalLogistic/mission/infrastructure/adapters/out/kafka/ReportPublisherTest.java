@@ -39,7 +39,7 @@ class ReportPublisherTest {
     }
 
     @Test
-    @DisplayName("send должен отправить команду в топик reports-data")
+    @DisplayName("send должен отправить команду в топик mission-reports-data")
     void send_ValidCommand_SendsToKafka() {
         CreateMissionCommand command = new CreateMissionCommand(
                 "TEST-001",
@@ -56,7 +56,7 @@ class ReportPublisherTest {
 
         verify(kafkaTemplate, times(1)).send(topicCaptor.capture(), messageCaptor.capture());
 
-        assertThat(topicCaptor.getValue()).isEqualTo("reports-data");
+        assertThat(topicCaptor.getValue()).isEqualTo("mission-reports-data");
         assertThat(messageCaptor.getValue()).isEqualTo(command);
     }
 
@@ -80,7 +80,7 @@ class ReportPublisherTest {
             reportPublisher.send(command);
         }
 
-        verify(kafkaTemplate, times(missionTypes.length)).send(eq("reports-data"), any(CreateMissionCommand.class));
+        verify(kafkaTemplate, times(missionTypes.length)).send(eq("mission-reports-data"), any(CreateMissionCommand.class));
     }
 
     @Test
@@ -103,7 +103,7 @@ class ReportPublisherTest {
             reportPublisher.send(command);
         }
 
-        verify(kafkaTemplate, times(priorities.length)).send(eq("reports-data"), any(CreateMissionCommand.class));
+        verify(kafkaTemplate, times(priorities.length)).send(eq("mission-reports-data"), any(CreateMissionCommand.class));
     }
 
     @Test
@@ -122,7 +122,7 @@ class ReportPublisherTest {
 
         reportPublisher.send(command);
 
-        verify(kafkaTemplate, times(1)).send("reports-data", command);
+        verify(kafkaTemplate, times(1)).send("mission-reports-data", command);
     }
 
     @Test
@@ -177,7 +177,7 @@ class ReportPublisherTest {
         reportPublisher.send(command1);
         reportPublisher.send(command2);
 
-        verify(kafkaTemplate, times(2)).send(eq("reports-data"), any(CreateMissionCommand.class));
+        verify(kafkaTemplate, times(2)).send(eq("mission-reports-data"), any(CreateMissionCommand.class));
     }
 
     @Test

@@ -1,4 +1,4 @@
-package org.orbitalLogistic.mission.config;
+package org.orbitalLogistic.user.configuration;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -47,15 +47,14 @@ public class KafkaConfig {
     }
 
     /*
-    * For each topic,
-    * 3 partitions => parallel msg handling => bigger throughput
-    * 3 replics => can't instantly loose all data when 1 broker fails
-    * (if broker 1 fails -> broker 2 becomes leader, and so on)
-    * */
+     * For each topic,
+     * 3 partitions => parallel msg handling => bigger throughput
+     * 3 replics => can't instantly loose all data when 1 broker fails
+     * (if broker 1 fails -> broker 2 becomes leader, and so on)
+     * */
 
     @Bean
     public NewTopic createReportsDataTopic() {
-        return new NewTopic("mission-reports-data", 3, (short) 3);
+        return new NewTopic("user-reports-data", 3, (short) 3);
     }
-
 }
