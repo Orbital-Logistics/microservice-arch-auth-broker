@@ -340,19 +340,6 @@ services:
       eureka-server:
         condition: service_healthy
 
-  message-producer-service:
-    build: ./message-producer-service
-    container_name: message-producer-service
-    environment:
-      - CONFIG_SERVER_URI=${CONFIG_SERVER_URI:-http://config-server:8888}
-    ports:
-      - 8087:8087
-    depends_on:
-      config-server:
-        condition: service_healthy
-      eureka-server:
-        condition: service_healthy
-
   api-gateway:
     build: ./api-gateway
     container_name: api-gateway
