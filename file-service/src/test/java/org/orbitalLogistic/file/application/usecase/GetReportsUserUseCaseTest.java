@@ -25,7 +25,6 @@ class GetReportsUserUseCaseTest {
 
     @Test
     void execute_Success() {
-        // Arrange
         String parent = "reports/123/";
         Long userId = 123L;
         String reportsFormat = "reports/%d/%s.pdf";
@@ -33,10 +32,10 @@ class GetReportsUserUseCaseTest {
 
         when(storageOperations.getListDir(FileCategory.USER, parent)).thenReturn(expectedFiles);
 
-        // Act
+        
         List<String> result = getReportsUserUseCase.execute(reportsFormat, userId);
 
-        // Assert
+        
         assertEquals(2, result.size());
         assertEquals("test1.pdf", result.get(0));
         assertEquals("test2.pdf", result.get(1));
@@ -45,17 +44,16 @@ class GetReportsUserUseCaseTest {
 
     @Test
     void execute_EmptyList() {
-        // Arrange
         String parent = "reports/123/";
         Long userId = 123L;
         String reportsFormat = "reports/%d/%s.pdf";
 
         when(storageOperations.getListDir(FileCategory.USER, parent)).thenReturn(List.of());
 
-        // Act
+        
         List<String> result = getReportsUserUseCase.execute(reportsFormat, userId);
 
-        // Assert
+        
         assertTrue(result.isEmpty());
         verify(storageOperations).getListDir(FileCategory.USER, parent);
     }

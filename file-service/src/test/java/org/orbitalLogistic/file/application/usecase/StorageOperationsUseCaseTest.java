@@ -28,23 +28,21 @@ class StorageOperationsUseCaseTest {
 
     @Test
     void upload_Success() {
-        // Arrange
         FileCategory category = FileCategory.USER;
         String path = "test/file.txt";
         InputStream inputStream = new ByteArrayInputStream("data".getBytes());
         long size = 100L;
         String contentType = "text/plain";
 
-        // Act
+        
         storageOperationsUseCase.upload(category, path, inputStream, size, contentType);
 
-        // Assert
+        
         verify(storageOperations).upload(category, path, inputStream, size, contentType);
     }
 
     @Test
     void download_Success() {
-        // Arrange
         FileCategory category = FileCategory.DEFAULT;
         String path = "downloads/file.pdf";
         InputStream mockStream = new ByteArrayInputStream("pdf data".getBytes());
@@ -53,10 +51,10 @@ class StorageOperationsUseCaseTest {
         when(storageOperations.download(category, path))
                 .thenReturn(expectedFileDto);
 
-        // Act
+        
         FileDto result = storageOperationsUseCase.download(category, path);
 
-        // Assert
+        
         assertNotNull(result);
         assertEquals("file.pdf", result.filename());
         verify(storageOperations).download(category, path);
@@ -64,7 +62,6 @@ class StorageOperationsUseCaseTest {
 
     @Test
     void getListDir_Success() {
-        // Arrange
         FileCategory category = FileCategory.USER;
         String path = "user/123/";
         List<String> expectedFiles = List.of("file1.txt", "file2.pdf");
@@ -72,42 +69,40 @@ class StorageOperationsUseCaseTest {
         when(storageOperations.getListDir(category, path))
                 .thenReturn(expectedFiles);
 
-        // Act
+        
         List<String> result = storageOperationsUseCase.getListDir(category, path);
 
-        // Assert
+        
         assertNotNull(result);
         assertEquals(2, result.size());
-        assertEquals("file1.txt", result.get(0));
+        assertEquals("file1.txt", result.getFirst());
         verify(storageOperations).getListDir(category, path);
     }
 
     @Test
     void remove_Success() {
-        // Arrange
         FileCategory category = FileCategory.USER;
         String path = "temp/old-file.jpg";
 
-        // Act
+        
         storageOperationsUseCase.remove(category, path);
 
-        // Assert
+        
         verify(storageOperations).remove(category, path);
     }
 
     @Test
     void getListDir_EmptyDirectory() {
-        // Arrange
         FileCategory category = FileCategory.DEFAULT;
         String path = "empty/";
 
         when(storageOperations.getListDir(category, path))
                 .thenReturn(List.of());
 
-        // Act
+        
         List<String> result = storageOperationsUseCase.getListDir(category, path);
 
-        // Assert
+        
         assertNotNull(result);
         assertTrue(result.isEmpty());
         verify(storageOperations).getListDir(category, path);

@@ -16,6 +16,10 @@ public class FileFormat {
     public static String getParent(String path) {
         if (path.equals("/"))
             return "";
-        return Paths.get(path).getParent().toString().replace("\\", "/") + "/";
+        java.nio.file.Path parent = Paths.get(path).getParent();
+        if (parent == null) {
+            return "";
+        }
+        return parent.toString().replace("\\", "/") + "/";
     }
 }

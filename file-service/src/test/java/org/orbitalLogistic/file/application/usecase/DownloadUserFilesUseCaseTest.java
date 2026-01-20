@@ -27,7 +27,6 @@ class DownloadUserFilesUseCaseTest {
 
     @Test
     void execute_Success() {
-        // Arrange
         Long userId = 123L;
         String fileFormat = "reports/%d/%s.pdf";
         String missionCode = "test";
@@ -38,10 +37,9 @@ class DownloadUserFilesUseCaseTest {
 
         when(storageOperations.download(FileCategory.USER, expectedFilename)).thenReturn(expectedFileDto);
 
-        // Act
         FileDto result = downloadUserFilesUseCase.execute(userId, fileFormat, missionCode);
 
-        // Assert
+        
         assertNotNull(result);
         assertEquals("report.pdf", result.filename());
         assertNotNull(result.inputStream());
