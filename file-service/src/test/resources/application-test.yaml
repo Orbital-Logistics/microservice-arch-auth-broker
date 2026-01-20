@@ -1,0 +1,34 @@
+spring:
+  cloud:
+    config:
+      enabled: false
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: file-service-test-group
+
+eureka:
+  client:
+    enabled: false
+
+minio:
+  formats:
+    reports: "mission-%d-%s.pdf"
+  url: "http://localhost:9000"
+  access-key: "minioadmin"
+  secret-key: "minioadmin"
+  bucket: "test-bucket"
+  buckets:
+    user-files: "test-user-files"
+    default: "test-default"
+
+jwt:
+  secret-key: "test-secret-key-for-integration-tests-that-is-long-enough"
+  expiration: 86400000
+
+logging:
+  level:
+    org.orbitalLogistic.file: DEBUG
