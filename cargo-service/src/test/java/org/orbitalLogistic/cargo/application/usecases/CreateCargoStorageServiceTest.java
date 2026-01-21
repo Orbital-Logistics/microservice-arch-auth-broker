@@ -6,10 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.orbitalLogistic.cargo.application.ports.out.CargoRepository;
-import org.orbitalLogistic.cargo.application.ports.out.CargoStorageRepository;
-import org.orbitalLogistic.cargo.application.ports.out.StorageUnitRepository;
-import org.orbitalLogistic.cargo.application.ports.out.UserServicePort;
+import org.orbitalLogistic.cargo.application.ports.out.*;
 import org.orbitalLogistic.cargo.domain.exception.*;
 import org.orbitalLogistic.cargo.domain.model.Cargo;
 import org.orbitalLogistic.cargo.domain.model.CargoStorage;
@@ -40,6 +37,9 @@ class CreateCargoStorageServiceTest {
 
     @Mock
     private UserServicePort userServicePort;
+
+    @Mock
+    private ReportSender reportSender;
 
     @InjectMocks
     private CreateCargoStorageService createCargoStorageService;
