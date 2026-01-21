@@ -68,7 +68,7 @@ public class PdfReportGeneratorImpl implements PdfReportGenerator {
 
     @Override
     public byte[] generate(UserReportDataDTO report) {
-        try (InputStream inputStream = storageOperations.download(FileCategory.USER, "reports/Mission report.pdf")
+        try (InputStream inputStream = storageOperations.download(FileCategory.USER, "reports/User report.pdf")
                 .inputStream();
              PdfReader pdfReader = new PdfReader(inputStream);
              ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -87,7 +87,7 @@ public class PdfReportGeneratorImpl implements PdfReportGenerator {
             canvas.beginText();
             canvas.setFontAndSize(font, 14);
 
-            canvas.showTextAligned(Element.ALIGN_LEFT, report.username(), 193, 650, 0);
+            canvas.showTextAligned(Element.ALIGN_LEFT, report.username(), 238, 650, 0);
             canvas.showTextAligned(Element.ALIGN_LEFT, report.email(), 238, 625, 0);
             canvas.showTextAligned(Element.ALIGN_LEFT, roles, 191, 600, 0);
 
@@ -104,7 +104,7 @@ public class PdfReportGeneratorImpl implements PdfReportGenerator {
 
     @Override
     public byte[] generate(CargoReportDataDTO report) {
-        try (InputStream inputStream = storageOperations.download(FileCategory.USER, "reports/Mission report.pdf")
+        try (InputStream inputStream = storageOperations.download(FileCategory.USER, "reports/Cargo report.pdf")
                 .inputStream();
              PdfReader pdfReader = new PdfReader(inputStream);
              ByteArrayOutputStream baos = new ByteArrayOutputStream();
