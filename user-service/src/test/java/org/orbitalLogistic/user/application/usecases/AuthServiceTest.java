@@ -9,10 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.orbitalLogistic.user.application.ports.in.LoginCommand;
 import org.orbitalLogistic.user.application.ports.in.RegisterCommand;
-import org.orbitalLogistic.user.application.ports.out.JwtTokenPort;
-import org.orbitalLogistic.user.application.ports.out.PasswordEncoderPort;
-import org.orbitalLogistic.user.application.ports.out.RoleRepository;
-import org.orbitalLogistic.user.application.ports.out.UserRepository;
+import org.orbitalLogistic.user.application.ports.out.*;
 import org.orbitalLogistic.user.domain.exception.InvalidCredentialsException;
 import org.orbitalLogistic.user.domain.exception.UserAlreadyExistsException;
 import org.orbitalLogistic.user.domain.exception.UserNotFoundException;
@@ -41,6 +38,9 @@ class AuthServiceTest {
 
     @Mock
     private JwtTokenPort jwtTokenPort;
+
+    @Mock
+    private ReportSender reportSender;
 
     @InjectMocks
     private AuthService authService;
