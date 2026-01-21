@@ -40,7 +40,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource(properties = {
         "spring.cloud.config.enabled=false",
         "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration",
-        "minio.formats.reports=mission-%d-%s.pdf"
+        "minio.formats.mission-reports=mission-%d-%s.pdf",
+        "minio.formats.cargo-reports=cargo-%d-%s.pdf",
+        "minio.formats.user-reports=user-%d-%s.pdf"
 })
 class FileOperationsIntegrationTest {
 

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.orbitalLogistic.file.adapters.kafka.dto.ReportDataDTO;
+import org.orbitalLogistic.file.adapters.kafka.dto.MissionReportDataDTO;
 import org.orbitalLogistic.file.application.usecase.ReportGenerationUseCase;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -35,7 +35,7 @@ class ReportGenerationEventListenerTest {
     @BeforeEach
     void setUp() {
         reportFormat = "mission-%d-%s.pdf";
-        ReflectionTestUtils.setField(listener, "reportsFormat", reportFormat);
+        ReflectionTestUtils.setField(listener, "missionReportsFormat", reportFormat);
     }
 
     @Test
@@ -50,7 +50,7 @@ class ReportGenerationEventListenerTest {
         message.put("scheduledDeparture", "2024-06-01T10:00:00");
         message.put("scheduledArrival", "2024-12-01T10:00:00");
 
-        ReportDataDTO reportData = new ReportDataDTO(
+        MissionReportDataDTO reportData = new MissionReportDataDTO(
                 "MISS-001",
                 "Mars Exploration",
                 "EXPLORATION",
@@ -61,21 +61,21 @@ class ReportGenerationEventListenerTest {
                 LocalDateTime.parse("2024-12-01T10:00:00")
         );
 
-        when(mapper.convertValue(message, ReportDataDTO.class)).thenReturn(reportData);
-        doNothing().when(reportGenerationUseCase).generateReport(any(ReportDataDTO.class), anyString());
+        when(mapper.convertValue(message, MissionReportDataDTO.class)).thenReturn(reportData);
+        doNothing().when(reportGenerationUseCase).generateMissionReport(any(MissionReportDataDTO.class), anyString());
 
         
-        listener.generateReport(message);
+        listener.generateMissionReport(message);
 
         
-        verify(mapper, times(1)).convertValue(message, ReportDataDTO.class);
-        verify(reportGenerationUseCase, times(1)).generateReport(eq(reportData), eq(reportFormat));
+        verify(mapper, times(1)).convertValue(message, MissionReportDataDTO.class);
+        verify(reportGenerationUseCase, times(1)).generateMissionReport(eq(reportData), eq(reportFormat));
     }
 
     @Test
     void shouldPassCorrectReportFormatToUseCase() {
         HashMap<String, Object> message = new HashMap<>();
-        ReportDataDTO reportData = new ReportDataDTO(
+        MissionReportDataDTO reportData = new MissionReportDataDTO(
                 "TEST-001",
                 "Test Mission",
                 "TEST",
@@ -86,30 +86,30 @@ class ReportGenerationEventListenerTest {
                 LocalDateTime.now().plusDays(30)
         );
 
-        when(mapper.convertValue(message, ReportDataDTO.class)).thenReturn(reportData);
-        doNothing().when(reportGenerationUseCase).generateReport(any(ReportDataDTO.class), anyString());
+        when(mapper.convertValue(message, MissionReportDataDTO.class)).thenReturn(reportData);
+        doNothing().when(reportGenerationUseCase).generateMissionReport(any(MissionReportDataDTO.class), anyString());
 
         
-        listener.generateReport(message);
+        listener.generateMissionReport(message);
 
         
-        verify(reportGenerationUseCase).generateReport(any(ReportDataDTO.class), eq("mission-%d-%s.pdf"));
+        verify(reportGenerationUseCase).generateMissionReport(any(MissionReportDataDTO.class), eq("mission-%d-%s.pdf"));
     }
 
     @Test
     void shouldHandleMessageWithAllRequiredFields() {
         HashMap<String, Object> message = createCompleteMessage();
-        ReportDataDTO reportData = createReportData();
+        MissionReportDataDTO reportData = createReportData();
 
-        when(mapper.convertValue(message, ReportDataDTO.class)).thenReturn(reportData);
-        doNothing().when(reportGenerationUseCase).generateReport(any(ReportDataDTO.class), anyString());
-
-        
-        listener.generateReport(message);
+        when(mapper.convertValue(message, MissionReportDataDTO.class)).thenReturn(reportData);
+        doNothing().when(reportGenerationUseCase).generateMissionReport(any(MissionReportDataDTO.class), anyString());
 
         
-        verify(mapper).convertValue(message, ReportDataDTO.class);
-        verify(reportGenerationUseCase).generateReport(reportData, reportFormat);
+        listener.generateMissionReport(message);
+
+        
+        verify(mapper).convertValue(message, MissionReportDataDTO.class);
+        verify(reportGenerationUseCase).generateMissionReport(reportData, reportFormat);
     }
 
     @Test
@@ -120,7 +120,7 @@ class ReportGenerationEventListenerTest {
             HashMap<String, Object> message = createCompleteMessage();
             message.put("missionType", missionType);
 
-            ReportDataDTO reportData = new ReportDataDTO(
+            MissionReportDataDTO reportData = new MissionReportDataDTO(
                     "MISS-001",
                     "Test Mission",
                     missionType,
@@ -131,14 +131,14 @@ class ReportGenerationEventListenerTest {
                     LocalDateTime.now().plusDays(30)
             );
 
-            when(mapper.convertValue(message, ReportDataDTO.class)).thenReturn(reportData);
-            doNothing().when(reportGenerationUseCase).generateReport(any(ReportDataDTO.class), anyString());
+            when(mapper.convertValue(message, MissionReportDataDTO.class)).thenReturn(reportData);
+            doNothing().when(reportGenerationUseCase).generateMissionReport(any(MissionReportDataDTO.class), anyString());
 
             
-            listener.generateReport(message);
+            listener.generateMissionReport(message);
 
             
-            verify(reportGenerationUseCase).generateReport(reportData, reportFormat);
+            verify(reportGenerationUseCase).generateMissionReport(reportData, reportFormat);
         }
     }
 
@@ -150,7 +150,7 @@ class ReportGenerationEventListenerTest {
             HashMap<String, Object> message = createCompleteMessage();
             message.put("priority", priority);
 
-            ReportDataDTO reportData = new ReportDataDTO(
+            MissionReportDataDTO reportData = new MissionReportDataDTO(
                     "MISS-001",
                     "Test Mission",
                     "EXPLORATION",
@@ -161,31 +161,31 @@ class ReportGenerationEventListenerTest {
                     LocalDateTime.now().plusDays(30)
             );
 
-            when(mapper.convertValue(message, ReportDataDTO.class)).thenReturn(reportData);
-            doNothing().when(reportGenerationUseCase).generateReport(any(ReportDataDTO.class), anyString());
+            when(mapper.convertValue(message, MissionReportDataDTO.class)).thenReturn(reportData);
+            doNothing().when(reportGenerationUseCase).generateMissionReport(any(MissionReportDataDTO.class), anyString());
 
             
-            listener.generateReport(message);
+            listener.generateMissionReport(message);
 
             
-            verify(reportGenerationUseCase).generateReport(reportData, reportFormat);
+            verify(reportGenerationUseCase).generateMissionReport(reportData, reportFormat);
         }
     }
 
     @Test
     void shouldHandleMapperConversionCorrectly() {
         HashMap<String, Object> message = createCompleteMessage();
-        ReportDataDTO expectedReportData = createReportData();
+        MissionReportDataDTO expectedReportData = createReportData();
 
-        when(mapper.convertValue(message, ReportDataDTO.class)).thenReturn(expectedReportData);
-        doNothing().when(reportGenerationUseCase).generateReport(any(ReportDataDTO.class), anyString());
-
-        
-        listener.generateReport(message);
+        when(mapper.convertValue(message, MissionReportDataDTO.class)).thenReturn(expectedReportData);
+        doNothing().when(reportGenerationUseCase).generateMissionReport(any(MissionReportDataDTO.class), anyString());
 
         
-        verify(mapper, times(1)).convertValue(eq(message), eq(ReportDataDTO.class));
-        verify(reportGenerationUseCase, times(1)).generateReport(expectedReportData, reportFormat);
+        listener.generateMissionReport(message);
+
+        
+        verify(mapper, times(1)).convertValue(eq(message), eq(MissionReportDataDTO.class));
+        verify(reportGenerationUseCase, times(1)).generateMissionReport(expectedReportData, reportFormat);
     }
 
     @Test
@@ -193,7 +193,7 @@ class ReportGenerationEventListenerTest {
         HashMap<String, Object> message = createCompleteMessage();
         message.put("missionCode", "VERY-LONG-MISSION-CODE-123456789");
 
-        ReportDataDTO reportData = new ReportDataDTO(
+        MissionReportDataDTO reportData = new MissionReportDataDTO(
                 "VERY-LONG-MISSION-CODE-123456789",
                 "Test Mission",
                 "EXPLORATION",
@@ -204,14 +204,14 @@ class ReportGenerationEventListenerTest {
                 LocalDateTime.now().plusDays(30)
         );
 
-        when(mapper.convertValue(message, ReportDataDTO.class)).thenReturn(reportData);
-        doNothing().when(reportGenerationUseCase).generateReport(any(ReportDataDTO.class), anyString());
+        when(mapper.convertValue(message, MissionReportDataDTO.class)).thenReturn(reportData);
+        doNothing().when(reportGenerationUseCase).generateMissionReport(any(MissionReportDataDTO.class), anyString());
 
         
-        listener.generateReport(message);
+        listener.generateMissionReport(message);
 
         
-        verify(reportGenerationUseCase).generateReport(reportData, reportFormat);
+        verify(reportGenerationUseCase).generateMissionReport(reportData, reportFormat);
     }
 
     @Test
@@ -220,7 +220,7 @@ class ReportGenerationEventListenerTest {
         message.put("commandingOfficerId", Long.MAX_VALUE);
         message.put("spacecraftId", Long.MAX_VALUE - 1);
 
-        ReportDataDTO reportData = new ReportDataDTO(
+        MissionReportDataDTO reportData = new MissionReportDataDTO(
                 "MISS-001",
                 "Test Mission",
                 "EXPLORATION",
@@ -231,14 +231,14 @@ class ReportGenerationEventListenerTest {
                 LocalDateTime.now().plusDays(30)
         );
 
-        when(mapper.convertValue(message, ReportDataDTO.class)).thenReturn(reportData);
-        doNothing().when(reportGenerationUseCase).generateReport(any(ReportDataDTO.class), anyString());
+        when(mapper.convertValue(message, MissionReportDataDTO.class)).thenReturn(reportData);
+        doNothing().when(reportGenerationUseCase).generateMissionReport(any(MissionReportDataDTO.class), anyString());
 
         
-        listener.generateReport(message);
+        listener.generateMissionReport(message);
 
         
-        verify(reportGenerationUseCase).generateReport(reportData, reportFormat);
+        verify(reportGenerationUseCase).generateMissionReport(reportData, reportFormat);
     }
 
     @Test
@@ -246,7 +246,7 @@ class ReportGenerationEventListenerTest {
         HashMap<String, Object> message = createCompleteMessage();
         LocalDateTime futureDate = LocalDateTime.now().plusYears(10);
         
-        ReportDataDTO reportData = new ReportDataDTO(
+        MissionReportDataDTO reportData = new MissionReportDataDTO(
                 "MISS-001",
                 "Future Mission",
                 "EXPLORATION",
@@ -257,14 +257,14 @@ class ReportGenerationEventListenerTest {
                 futureDate.plusMonths(6)
         );
 
-        when(mapper.convertValue(message, ReportDataDTO.class)).thenReturn(reportData);
-        doNothing().when(reportGenerationUseCase).generateReport(any(ReportDataDTO.class), anyString());
+        when(mapper.convertValue(message, MissionReportDataDTO.class)).thenReturn(reportData);
+        doNothing().when(reportGenerationUseCase).generateMissionReport(any(MissionReportDataDTO.class), anyString());
 
         
-        listener.generateReport(message);
+        listener.generateMissionReport(message);
 
         
-        verify(reportGenerationUseCase).generateReport(reportData, reportFormat);
+        verify(reportGenerationUseCase).generateMissionReport(reportData, reportFormat);
     }
 
     
@@ -281,8 +281,8 @@ class ReportGenerationEventListenerTest {
         return message;
     }
 
-    private ReportDataDTO createReportData() {
-        return new ReportDataDTO(
+    private MissionReportDataDTO createReportData() {
+        return new MissionReportDataDTO(
                 "MISS-001",
                 "Test Mission",
                 "EXPLORATION",

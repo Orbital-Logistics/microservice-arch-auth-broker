@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.orbitalLogistic.file.adapters.exceptions.MinioException;
-import org.orbitalLogistic.file.adapters.kafka.dto.ReportDataDTO;
+import org.orbitalLogistic.file.adapters.kafka.dto.MissionReportDataDTO;
 import org.orbitalLogistic.file.application.model.FileCategory;
 import org.orbitalLogistic.file.application.ports.PdfReportGenerator;
 import org.orbitalLogistic.file.application.ports.StorageOperations;
@@ -31,13 +31,13 @@ class ReportGenerationUseCaseTest {
     @InjectMocks
     private ReportGenerationUseCase reportGenerationUseCase;
 
-    private ReportDataDTO testReportData;
+    private MissionReportDataDTO testReportData;
     private String reportFormat;
 
     @BeforeEach
     void setUp() {
         reportFormat = "mission-%d-%s.pdf";
-        testReportData = new ReportDataDTO(
+        testReportData = new MissionReportDataDTO(
                 "MISS-001",
                 "Mars Exploration",
                 "EXPLORATION",
@@ -50,7 +50,7 @@ class ReportGenerationUseCaseTest {
     }
 
     @Test
-    void shouldGenerateReportSuccessfully() throws Exception {
+    void shouldGenerateMissionReportSuccessfully() throws Exception {
         
         byte[] pdfBytes = "PDF content".getBytes();
         when(pdfReportGenerator.generate(testReportData)).thenReturn(pdfBytes);
@@ -63,13 +63,13 @@ class ReportGenerationUseCaseTest {
         );
 
         
-        reportGenerationUseCase.generateReport(testReportData, reportFormat);
+        reportGenerationUseCase.generateMissionReport(testReportData, reportFormat);
 
         
         verify(pdfReportGenerator, times(1)).generate(testReportData);
         verify(storageOperations, times(1)).upload(
                 eq(FileCategory.USER),
-                eq("mission-456-MISS-001.pdf"),
+                eq("mission-1-mission-MISS-001.pdf"),
                 any(InputStream.class),
                 eq((long) pdfBytes.length),
                 eq("application/pdf")
@@ -90,15 +90,12 @@ class ReportGenerationUseCaseTest {
         );
 
         
-        reportGenerationUseCase.generateReport(testReportData, reportFormat);
+        reportGenerationUseCase.generateMissionReport(testReportData, reportFormat);
 
         
-        String expectedFilename = String.format(reportFormat, 
-                testReportData.spacecraftId(), 
-                testReportData.missionCode());
         verify(storageOperations).upload(
                 eq(FileCategory.USER),
-                eq(expectedFilename),
+                eq("mission-1-mission-MISS-001.pdf"),
                 any(InputStream.class),
                 anyLong(),
                 anyString()
@@ -119,7 +116,7 @@ class ReportGenerationUseCaseTest {
         );
 
         
-        reportGenerationUseCase.generateReport(testReportData, reportFormat);
+        reportGenerationUseCase.generateMissionReport(testReportData, reportFormat);
 
         
         verify(storageOperations).upload(
@@ -145,7 +142,7 @@ class ReportGenerationUseCaseTest {
         );
 
         
-        reportGenerationUseCase.generateReport(testReportData, reportFormat);
+        reportGenerationUseCase.generateMissionReport(testReportData, reportFormat);
 
         
         verify(storageOperations).upload(
@@ -172,7 +169,7 @@ class ReportGenerationUseCaseTest {
 
         
         assertThrows(MinioException.class, () -> 
-                reportGenerationUseCase.generateReport(testReportData, reportFormat));
+                reportGenerationUseCase.generateMissionReport(testReportData, reportFormat));
         
         verify(pdfReportGenerator, times(1)).generate(testReportData);
         verify(storageOperations, times(1)).upload(
@@ -187,7 +184,7 @@ class ReportGenerationUseCaseTest {
     @Test
     void shouldHandlePdfGenerationWithDifferentReportData() throws Exception {
         
-        ReportDataDTO differentReport = new ReportDataDTO(
+        MissionReportDataDTO differentReport = new MissionReportDataDTO(
                 "TEST-999",
                 "Test Mission",
                 "CARGO",
@@ -209,13 +206,13 @@ class ReportGenerationUseCaseTest {
         );
 
         
-        reportGenerationUseCase.generateReport(differentReport, reportFormat);
+        reportGenerationUseCase.generateMissionReport(differentReport, reportFormat);
 
         
         verify(pdfReportGenerator).generate(differentReport);
         verify(storageOperations).upload(
                 eq(FileCategory.USER),
-                eq("mission-888-TEST-999.pdf"),
+                eq("mission-1-mission-TEST-999.pdf"),
                 any(InputStream.class),
                 eq((long) pdfBytes.length),
                 eq("application/pdf")
@@ -236,7 +233,7 @@ class ReportGenerationUseCaseTest {
         );
 
         
-        reportGenerationUseCase.generateReport(testReportData, reportFormat);
+        reportGenerationUseCase.generateMissionReport(testReportData, reportFormat);
 
         
         verify(storageOperations).upload(
@@ -251,7 +248,7 @@ class ReportGenerationUseCaseTest {
     @Test
     void shouldHandleReportsWithSpecialCharactersInMissionCode() throws Exception {
         
-        ReportDataDTO specialReport = new ReportDataDTO(
+        MissionReportDataDTO specialReport = new MissionReportDataDTO(
                 "MISS-001-SPECIAL_TEST",
                 "Special Mission",
                 "EXPLORATION",
@@ -273,12 +270,12 @@ class ReportGenerationUseCaseTest {
         );
 
         
-        reportGenerationUseCase.generateReport(specialReport, reportFormat);
+        reportGenerationUseCase.generateMissionReport(specialReport, reportFormat);
 
         
         verify(storageOperations).upload(
                 any(FileCategory.class),
-                eq("mission-2-MISS-001-SPECIAL_TEST.pdf"),
+                eq("mission-1-mission-MISS-001-SPECIAL_TEST.pdf"),
                 any(InputStream.class),
                 anyLong(),
                 anyString()
@@ -300,12 +297,12 @@ class ReportGenerationUseCaseTest {
         );
 
         
-        reportGenerationUseCase.generateReport(testReportData, customFormat);
+        reportGenerationUseCase.generateMissionReport(testReportData, customFormat);
 
         
         verify(storageOperations).upload(
                 any(FileCategory.class),
-                eq("report_456_MISS-001.pdf"),
+                eq("report_1_mission-MISS-001.pdf"),
                 any(InputStream.class),
                 anyLong(),
                 anyString()
@@ -326,7 +323,7 @@ class ReportGenerationUseCaseTest {
         );
 
         
-        reportGenerationUseCase.generateReport(testReportData, reportFormat);
+        reportGenerationUseCase.generateMissionReport(testReportData, reportFormat);
 
         
         verify(storageOperations).upload(

@@ -39,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = FileController.class)
 @Import({SecurityConfig.class, FileControllerTest.TestSecurityConfig.class})
 @TestPropertySource(properties = {
-        "minio.formats.reports=mission-%d-%s.pdf",
+        "minio.formats.mission-reports=mission-%d-%s.pdf",
         "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration",
         "spring.cloud.config.enabled=false"
 })

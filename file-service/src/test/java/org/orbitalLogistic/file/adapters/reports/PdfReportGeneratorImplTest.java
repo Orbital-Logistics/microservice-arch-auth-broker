@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.orbitalLogistic.file.adapters.kafka.dto.ReportDataDTO;
+import org.orbitalLogistic.file.adapters.kafka.dto.MissionReportDataDTO;
 import org.orbitalLogistic.file.application.model.FileCategory;
 import org.orbitalLogistic.file.application.ports.StorageOperations;
 import org.orbitalLogistic.file.application.ports.dto.FileDto;
@@ -28,11 +28,11 @@ class PdfReportGeneratorImplTest {
     @InjectMocks
     private PdfReportGeneratorImpl pdfReportGenerator;
 
-    private ReportDataDTO testReportData;
+    private MissionReportDataDTO testReportData;
 
     @BeforeEach
     void setUp() {
-        testReportData = new ReportDataDTO(
+        testReportData = new MissionReportDataDTO(
                 "MISS-001",
                 "Mars Exploration",
                 "EXPLORATION",
@@ -101,7 +101,7 @@ class PdfReportGeneratorImplTest {
     @Test
     void shouldHandleReportDataWithDifferentMissionTypes() {
         
-        ReportDataDTO cargoMission = new ReportDataDTO(
+        MissionReportDataDTO cargoMission = new MissionReportDataDTO(
                 "CARGO-001",
                 "Cargo Transport",
                 "CARGO",
@@ -130,7 +130,7 @@ class PdfReportGeneratorImplTest {
     @Test
     void shouldHandleReportDataWithDifferentPriorities() {
         
-        ReportDataDTO lowPriorityMission = new ReportDataDTO(
+        MissionReportDataDTO lowPriorityMission = new MissionReportDataDTO(
                 "TEST-001",
                 "Test Mission",
                 "EXPLORATION",
@@ -159,7 +159,7 @@ class PdfReportGeneratorImplTest {
     @Test
     void shouldHandleReportWithLongMissionNames() {
         
-        ReportDataDTO longNameMission = new ReportDataDTO(
+        MissionReportDataDTO longNameMission = new MissionReportDataDTO(
                 "LONG-001",
                 "Very Long Mission Name That Contains Multiple Words And Descriptions For Testing Purposes",
                 "EXPLORATION",
@@ -188,7 +188,7 @@ class PdfReportGeneratorImplTest {
     @Test
     void shouldHandleReportWithSpecialCharacters() {
         
-        ReportDataDTO specialCharMission = new ReportDataDTO(
+        MissionReportDataDTO specialCharMission = new MissionReportDataDTO(
                 "MISS-001_SPECIAL",
                 "Special Mission",
                 "EXPLORATION",
@@ -217,7 +217,7 @@ class PdfReportGeneratorImplTest {
     @Test
     void shouldHandleReportWithLargeIds() {
         
-        ReportDataDTO largeIdMission = new ReportDataDTO(
+        MissionReportDataDTO largeIdMission = new MissionReportDataDTO(
                 "LARGE-001",
                 "Large ID Mission",
                 "EXPLORATION",
@@ -247,7 +247,7 @@ class PdfReportGeneratorImplTest {
     void shouldHandleReportWithFutureDates() {
         
         LocalDateTime futureDate = LocalDateTime.now().plusYears(10);
-        ReportDataDTO futureMission = new ReportDataDTO(
+        MissionReportDataDTO futureMission = new MissionReportDataDTO(
                 "FUTURE-001",
                 "Future Mission",
                 "EXPLORATION",
