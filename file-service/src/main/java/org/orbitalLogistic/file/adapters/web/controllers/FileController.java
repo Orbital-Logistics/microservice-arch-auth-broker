@@ -43,7 +43,8 @@ public class FileController {
     )
     @GetMapping("/get-reports-list")
     public ResponseEntity<List<String>> getReportsList(@AuthenticationPrincipal UserPrincipal principal) {
-        List<String> files = getReportsUserUseCase.execute(reportsFormat, principal.getUserId());
+//        List<String> files = getReportsUserUseCase.execute(reportsFormat, principal.getUserId());
+        List<String> files = getReportsUserUseCase.execute(reportsFormat, 1L);
         return ResponseEntity.ok(files);
     }
 
@@ -56,7 +57,7 @@ public class FileController {
             @RequestBody @NotBlank String missionCode,
             @AuthenticationPrincipal UserPrincipal principal
     ) {
-        FileDto fileDto = downloadUserFilesUseCase.execute(principal.getUserId(), reportsFormat, missionCode);
+        FileDto fileDto = downloadUserFilesUseCase.execute(1L, reportsFormat, missionCode);
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .header("Content-disposition", "attachment; filename=\"" + fileDto.filename() + "\"")
