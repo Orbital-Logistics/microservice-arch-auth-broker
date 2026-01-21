@@ -9,6 +9,11 @@ spring:
     config:
       enabled: false
 
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: cargo-service-test-group
+
 eureka:
   client:
     enabled: false
